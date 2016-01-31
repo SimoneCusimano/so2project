@@ -1,19 +1,22 @@
 package com.unica.so2.enotesrecorder;
 
 import android.app.Activity;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 
 public class NewNoteActivity extends Activity {
-    Button play,stop,record;
+    Button cancel,stop,record;
+    FloatingActionButton save;
+    private boolean isRecording = false; // It handles the Rec/Pause Button state
     private MediaRecorder myAudioRecorder;
     private String outputFile = null;
 
@@ -22,40 +25,58 @@ public class NewNoteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_note);
 
-        play=(Button)findViewById(R.id.cancelButton);
-        stop=(Button)findViewById(R.id.stopButton);
-        record=(Button)findViewById(R.id.recButton);
+        cancel = (Button)findViewById(R.id.cancelButton);
+        stop = (Button)findViewById(R.id.stopButton);
+        record = (Button)findViewById(R.id.recButton);
 
         stop.setEnabled(false);
-        play.setEnabled(false);
-        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";;
-
-        myAudioRecorder=new MediaRecorder();
-        myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-        myAudioRecorder.setOutputFile(outputFile);
+        cancel.setEnabled(false);
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";;
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    myAudioRecorder.prepare();
-                    myAudioRecorder.start();
-                }
+                if (isRecording)
+                {
+                    // Pause stuff
+                    record.setBackgroundResource(R.drawable.ic_pause_black_48dp);
 
-                catch (IllegalStateException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
+                else
+                {
+                    // Recording Mode
+                    record.setBackgroundResource(R.drawable.ic_mic_black_48dp);
 
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    // Check if myAudioRecorder has been aborted (Cancel Event) and it needs to be reconfigured
+                    if (myAudioRecorder == null)
+                    {
+                        myAudioRecorder = new MediaRecorder();
+                        myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                        myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                        myAudioRecorder.setOutputFile(outputFile);
+                    }
+
+                    try
+                    {
+                        myAudioRecorder.prepare();
+                        myAudioRecorder.start();
+                    }
+                    catch (IllegalStateException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    catch (IOException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
 
                 record.setEnabled(false);
                 stop.setEnabled(true);
+                cancel.setEnabled(true);
 
                 Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_LONG).show();
             }
@@ -66,39 +87,44 @@ public class NewNoteActivity extends Activity {
             public void onClick(View v) {
                 myAudioRecorder.stop();
                 myAudioRecorder.release();
-                myAudioRecorder  = null;
+                myAudioRecorder = null;
 
+                record.setEnabled(false);
                 stop.setEnabled(false);
-                play.setEnabled(true);
+                cancel.setEnabled(true);
 
-                Toast.makeText(getApplicationContext(), "Audio recorded successfully",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_LONG).show();
             }
         });
 
-        play.setOnClickListener(new View.OnClickListener() {
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) throws IllegalArgumentException,SecurityException,IllegalStateException {
-                MediaPlayer m = new MediaPlayer();
-
-                try {
-                    m.setDataSource(outputFile);
+            public void onClick(View v) {
+                try
+                {
+                    myAudioRecorder.reset();
+                    File file = new File(outputFile);
+                    file.delete();
                 }
-
-                catch (IOException e) {
+                catch (Exception e)
+                {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
-                try {
-                    m.prepare();
-                }
+                record.setEnabled(true);
+                stop.setEnabled(false);
+                cancel.setEnabled(false);
 
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                m.start();
-                Toast.makeText(getApplicationContext(), "Playing audio", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Recording aborted", Toast.LENGTH_LONG).show();
             }
         });
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    // Save stuff...
+                }
+            });
     }
 }
