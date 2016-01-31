@@ -68,7 +68,7 @@
                 android:text="STOP" />
 
             <Button
-                android:id="@+id/cancelImageButton"
+                android:id="@+id/cancelButton"
                 android:layout_toRightOf="@+id/stopButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
