@@ -28,6 +28,7 @@ public class NewNoteActivity extends Activity {
         cancel = (Button)findViewById(R.id.cancelButton);
         stop = (Button)findViewById(R.id.stopButton);
         record = (Button)findViewById(R.id.recButton);
+        save = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
 
         stop.setEnabled(false);
         cancel.setEnabled(false);
@@ -40,7 +41,6 @@ public class NewNoteActivity extends Activity {
                 {
                     // Pause stuff
                     record.setBackgroundResource(R.drawable.ic_pause_black_48dp);
-
                 }
                 else
                 {
@@ -123,7 +123,7 @@ public class NewNoteActivity extends Activity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    // Save stuff...
+                Toast.makeText(getApplicationContext(), "Note saved", Toast.LENGTH_SHORT).show();
                 }
             });
     }
