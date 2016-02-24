@@ -50,31 +50,28 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal">
 
-            <Button
+            <ImageButton
                 android:id="@+id/recButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/ic_mic_black_48dp"
-                android:text="REC" />
+                android:src="@drawable/ic_mic_black_48dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/stopButton"
                 android:layout_toRightOf="@+id/recButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/ic_stop_black_48dp"
-                android:text="STOP" />
+                android:src="@drawable/ic_stop_black_48dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/cancelButton"
                 android:layout_toRightOf="@+id/stopButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/ic_not_interested_black_48dp"
-                android:text="CANCEL" />
+                android:src="@drawable/ic_not_interested_black_48dp" />
 
         </LinearLayout>
 
