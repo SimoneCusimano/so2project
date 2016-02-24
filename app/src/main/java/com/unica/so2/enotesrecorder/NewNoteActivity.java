@@ -40,16 +40,17 @@ public class NewNoteActivity extends Activity {
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+                try
+                {
                     if (isRecording)
                     {
                         // Pause stuff
-                        record.setBackgroundResource(R.drawable.ic_pause_black_48dp);
+                        record.setImageResource(R.drawable.ic_mic_black_48dp);
                     }
                     else
                     {
                         // Recording Mode
-                        record.setBackgroundResource(R.drawable.ic_mic_black_48dp);
+                        record.setImageResource(R.drawable.ic_pause_black_48dp);
 
                         File directory = new File(outputFile).getParentFile();
                         if (!directory.exists())
@@ -70,7 +71,6 @@ public class NewNoteActivity extends Activity {
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
 
-                        record.setEnabled(true);
                         stop.setEnabled(true);
                         cancel.setEnabled(true);
 
@@ -94,7 +94,7 @@ public class NewNoteActivity extends Activity {
                     myAudioRecorder.stop();
                     myAudioRecorder.release();
                     myAudioRecorder = null;
-                    record.setBackgroundResource(R.drawable.ic_mic_black_48dp);
+                    record.setImageResource(R.drawable.ic_mic_black_48dp);
 
                     record.setEnabled(false);
                     stop.setEnabled(false);
@@ -121,7 +121,7 @@ public class NewNoteActivity extends Activity {
 
                     File file = new File(outputFile);
                     file.delete();
-                    record.setBackgroundResource(R.drawable.ic_mic_black_48dp);
+                    record.setImageResource(R.drawable.ic_mic_black_48dp);
 
                     record.setEnabled(true);
                     stop.setEnabled(false);
