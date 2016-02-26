@@ -5,18 +5,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import com.unica.so2.enotesrecorder.Helper.DatabaseHelper;
+import com.unica.so2.enotesrecorder.Model.Note;
 
-public class DbAdapter {
+import java.util.ArrayList;
+
+public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
     private static final String DATABASE_TABLE = "note";
     public static final String KEY_TITLE = "title";
-    public static final String KEY_DATE = "last_edit";
+    public static final String KEY_LAST_EDIT = "last_edit";
     public static final String KEY_BODY = "body";
     public static final String KEY_ID = "_id";
     public static final String KEY_AUDIO = "audio";
     public static final String KEY_RATING = "rating";
+    private static final String CREATE_TABLE = "";
 
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
@@ -29,7 +34,7 @@ public class DbAdapter {
      *
      * @param ctx the Context within which to work
      */
-    public DbAdapter(Context ctx) {
+    public DbHandler(Context ctx) {
         this.mCtx = ctx;
     }
 
@@ -42,7 +47,7 @@ public class DbAdapter {
      *         initialization call)
      * @throws SQLException if the database could be neither opened or created
      */
-    public DbAdapter open() throws SQLException {
+    public DbHandler open() throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
         mDb = mDbHelper.getWritableDatabase();
         return this;
@@ -50,6 +55,17 @@ public class DbAdapter {
 
     public void close() {
         mDbHelper.close();
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(DROP_TABLE);
+        onCreate(db);
     }
 
 
@@ -62,11 +78,11 @@ public class DbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String body, String date, String audio, String rating) {
+    public long createNote(String title, String body, String lastEdit, String audio, String rating) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
-        initialValues.put(KEY_DATE, date);
+        initialValues.put(KEY_LAST_EDIT, lastEdit);
         initialValues.put(KEY_AUDIO, audio);
         initialValues.put(KEY_RATING, rating);
         return mDb.insert(DATABASE_TABLE, null, initialValues);
@@ -91,7 +107,7 @@ public class DbAdapter {
     public Cursor fetchAllNotes() {
 
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ID, KEY_TITLE,
-                KEY_BODY,KEY_DATE}, null, null, null, null, null);
+                KEY_BODY, KEY_LAST_EDIT}, null, null, null, null, null);
     }
 
     /**
@@ -106,7 +122,7 @@ public class DbAdapter {
         Cursor mCursor =
 
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_ID,
-                                KEY_TITLE, KEY_BODY,KEY_DATE}, KEY_ID + "=" + rowId, null,
+                                KEY_TITLE, KEY_BODY, KEY_LAST_EDIT}, KEY_ID + "=" + rowId, null,
                         null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -131,9 +147,24 @@ public class DbAdapter {
         args.put(KEY_BODY, body);
 
         //This lines is added for personal reason
-        args.put(KEY_DATE, date);
+        args.put(KEY_LAST_EDIT, date);
 
         //One more parameter is added for data
         return mDb.update(DATABASE_TABLE, args, KEY_ID + "=" + rowId, null) > 0;
+    }
+
+    @Override
+    public void addNote(Note note) {
+        
+    }
+
+    @Override
+    public ArrayList<Note> getAllNote() {
+        return null;
+    }
+
+    @Override
+    public int getNoteCount() {
+        return 0;
     }
 }
