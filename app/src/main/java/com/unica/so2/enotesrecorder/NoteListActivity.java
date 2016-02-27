@@ -1,21 +1,22 @@
 package com.unica.so2.enotesrecorder;
 
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.view.ContextMenu;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.support.v7.widget.Toolbar;
 
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
+import com.unica.so2.enotesrecorder.Model.Note;
+
+import java.util.ArrayList;
 
 /**
  * An activity representing a list of Notes. This activity
@@ -25,65 +26,70 @@ import com.unica.so2.enotesrecorder.DAL.DbHandler;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class NoteListActivity extends ListActivity {
+public class NoteListActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
 
     private static final int DELETE_ID = Menu.FIRST;
 
-    private DbHandler mDbHelper;
+    private DbHandler _dbHandler;
+    private ListView _notesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_list);
-        mDbHelper = new DbHandler(this);
-        mDbHelper.open();
-        fillData();
-        registerForContextMenu(getListView());
-        Button addNoteButton = (Button)findViewById(R.id.action_new);
+        _dbHandler = new DbHandler(this);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        createList();
+        _notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(parent.getContext(), EditNoteActivity.class);
+                i.putExtra(DbHandler.KEY_ID, id);
+                startActivityForResult(i, ACTIVITY_EDIT);
+
+            }
+        });
+        //registerForContextMenu(getListView());
+        /*Button addNoteButton = (Button)findViewById(R.id.action_new);
         addNoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNote();
             }
-        });
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.notelist_menu, menu);
-        return true;
+        });*/
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_about:
-
-                AlertDialog.Builder dialog = new AlertDialog.Builder(NoteListActivity.this);
-                dialog.setTitle("About");
-                dialog.setMessage("Hello! I'm Heng, the creator of this application. This application is created based on learning." +
-                                " Used it on trading or any others activity that is related to business is strictly forbidden."
-                                +"If there is any bug is found please freely e-mail me. "+
-                                "\n\tedisonthk@gmail.com"
-                );
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-
-                    }
-                });
-                dialog.show();
+            case R.id.action_new:
+                // User chose the "Add" action, mark the current item
+                Intent i = new Intent(this, NewNoteActivity.class);
+                startActivity(i);
                 return true;
 
             default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
+
         }
     }
 
@@ -92,51 +98,41 @@ public class NoteListActivity extends ListActivity {
         startActivityForResult(i, ACTIVITY_CREATE);
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Intent i = new Intent(this, EditNoteActivity.class);
-        i.putExtra(DbHandler.KEY_ID, id);
-        startActivityForResult(i, ACTIVITY_EDIT);
-    }
-
-    private void fillData() {
+    private void createList() {
         // Get all of the notes from the database and create the item list
-        Cursor notesCursor = mDbHelper.fetchAllNotes();
-        startManagingCursor(notesCursor);
+        _dbHandler.open();
+        ArrayList<Note> notes = _dbHandler.getAllNotes();
+        String[] notesArrayList = notes.toArray(new String[notes.size()]);
+        _dbHandler.close();
 
-
-        String[] from = new String[] { DbHandler.KEY_TITLE , DbHandler.KEY_LAST_EDIT};
-        int[] to = new int[] { R.id.text1 ,R.id.date_row};
-
-        // Now create an array adapter and set it to display using our row
-        SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
-        setListAdapter(notes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
+        _notesList = (ListView) findViewById(android.R.id.list);
+        _notesList.setAdapter(adapter);
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_ID, 0, R.string.menu_delete);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.homeactionbar, menu);
+        return true;
     }
 
+    /*
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case DELETE_ID:
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                mDbHelper.deleteNote(info.id);
-                fillData();
+                _dbHandler.deleteNote(info.id);
+                createList();
                 return true;
         }
         return super.onContextItemSelected(item);
     }
+    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        fillData();
+        createList();
     }
 }

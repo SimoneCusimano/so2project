@@ -36,7 +36,7 @@ public class EditNoteActivity extends Activity {
         setTitle(R.string.app_name);
 
         mTitleText = (EditText) findViewById(R.id.title);
-        mBodyText = (EditText) findViewById(R.id.content);
+        //mBodyText = (EditText) findViewById(R.id.content);
 
 
         mRowId = (savedInstanceState == null) ? null :
@@ -73,16 +73,16 @@ public class EditNoteActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.noteedit_menu, menu);
+        //getMenuInflater().inflate(R.menu.noteedit_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        /*switch (item.getItemId()) {
             case R.id.menu_about:
 
-		    	/* Here is the introduce about myself */
+		    	/* Here is the introduce about myself
                 AlertDialog.Builder dialog = new AlertDialog.Builder(NoteEdit.this);
                 dialog.setTitle("About");
                 dialog.setMessage("Hello! I'm Heng, the creator of this application. This application is created for learning." +
@@ -116,7 +116,8 @@ public class EditNoteActivity extends Activity {
                 finish();
             default:
                 return super.onOptionsItemSelected(item);
-        }
+        }*/
+        return true;
     }
 
     private void saveState() {
@@ -127,22 +128,22 @@ public class EditNoteActivity extends Activity {
         Date currentDateTime = new Date(msTime);
 
         if(mRowId == null){
-            long id = mDbHelper.createNote(title, body, currentDateTime,);
-            if(id > 0){
+            //long id = mDbHelper.createNote(title, body, currentDateTime,);
+            /*if(id > 0){
                 mRowId = id;
             }else{
                 Log.e("saveState", "failed to create note");
-            }
+            }*/
         }else{
-            if(!mDbHelper.updateNote(mRowId, title, body, curDate)){
-                Log.e("saveState","failed to update note");
-            }
+            //if(!mDbHelper.updateNote(mRowId, title, body, curDate)){
+            //    Log.e("saveState","failed to update note");
+            //}
         }
     }
 
 
     private void populateFields() {
-        if (mRowId != null) {
+        /*if (mRowId != null) {
             note = mDbHelper.getNote(mRowId);
             startManagingCursor(note);
             mTitleText.setText(note.getString(
@@ -151,6 +152,6 @@ public class EditNoteActivity extends Activity {
                     note.getColumnIndexOrThrow(DbHandler.KEY_BODY)));
             curText = note.getString(
                     note.getColumnIndexOrThrow(DbHandler.KEY_BODY));
-        }
+        }*/
     }
 }

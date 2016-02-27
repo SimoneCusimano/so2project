@@ -6,13 +6,13 @@ import java.util.Date;
 public class Note {
     private String _id;
     private String _title;
-    private String _content;
+    private Content _content;
     private Date _lastEdit;
     private double _rating;
 
     public Note(){}
 
-    public Note(String id, String title, String content, Date lastEdit, double rating) {
+    public Note(String id, String title, Content content, Date lastEdit, double rating) {
         this._id = id;
         this._title = title;
         this._content = content;
@@ -36,11 +36,11 @@ public class Note {
         this._title = title;
     }
 
-    public String getContent() {
+    public Content getContent() {
         return _content;
     }
 
-    public void setContent(String content) {
+    public void setContent(Content content) {
         this._content = content;
     }
 
