@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.unica.so2.enotesrecorder.Helper.JsonHelper;
 import com.unica.so2.enotesrecorder.Model.Note;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * successfully created return the new rowId for that note, otherwise return
      * a -1 to indicate failure.
      *
-     * @param note
+     * @param note note to add
      * @return rowId or -1 if failed
      */
     @Override
@@ -84,8 +85,8 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             Date currentDateTime = new Date(msTime);
 
             initialValues.put(KEY_TITLE, note.getTitle());
-            initialValues.put(KEY_CONTENT, note.getContent());
-            initialValues.put(KEY_DATE, currentDateTime.toString());
+            initialValues.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
+            initialValues.put(KEY_LAST_EDIT, currentDateTime.toString());
             initialValues.put(KEY_RATING, note.getRating());
             result = _db.insert(TABLE_NAME, null, initialValues);
         }catch (Exception e){
@@ -129,14 +130,15 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         ArrayList<Note> noteList;
         String query = "SELECT * FROM "+TABLE_NAME;
         Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list=new ArrayList<Note>();
+        ArrayList<Note> list= new ArrayList<>();
 
         while(cursor.moveToNext()){
             Note note=new Note();
             note.setId(cursor.getString(0));
             note.setTitle(cursor.getString(1));
-            note.setContent(cursor.getString(2));
-       /*     note.setRating(cursor.getString(2));
+        /*
+            note.setContent((Content)cursor.getString(2));
+            note.setRating(cursor.getString(2));
             note.setContent(cursor.getString(2));*/
 
             list.add(note);
@@ -149,18 +151,20 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     /*Return the number of item in the table */
     @Override
     public int getNoteCount() {
-        int num = 0;
+        int count = 0;
         SQLiteDatabase db = this.getReadableDatabase();
+
         try{
-            String QUERY = "SELECT * FROM "+TABLE_NAME;
+            String QUERY = "SELECT * FROM " + TABLE_NAME;
             Cursor cursor = db.rawQuery(QUERY, null);
-            num = cursor.getCount();
+            count = cursor.getCount();
             db.close();
-            return num;
-        }catch (Exception e){
+        }
+        catch (Exception e){
             Log.e("error", e + "");
         }
-        return 0;
+
+        return count;
     }
 
     /**

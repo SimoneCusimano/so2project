@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 public class JsonHelper {
 
         /*serialization: from Content to Json string*/
-        public String serializeContent(Content content) {
+        public static String serializeContent(Content content) {
 
             String jsonString = "";
 
@@ -29,7 +29,7 @@ public class JsonHelper {
         }
 
         // deserialization: from Json string to Content
-        public Content deserializeContent (String jsonString) {
+        public static Content deserializeContent (String jsonString) {
             Content content = new Content();
 
             try {
