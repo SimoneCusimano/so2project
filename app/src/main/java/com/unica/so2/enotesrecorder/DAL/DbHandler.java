@@ -2,9 +2,11 @@ package com.unica.so2.enotesrecorder.DAL;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.unica.so2.enotesrecorder.Model.Note;
 
@@ -65,11 +67,6 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         onCreate(db);
     }
 
-    @Override
-    public int getNoteCount() {
-        return 0;
-    }
-
     /**
      * Create a new note using the title and body provided. If the note is
      * successfully created return the new rowId for that note, otherwise return
@@ -80,15 +77,22 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public long addNote(Note note) {
-        ContentValues initialValues = new ContentValues();
-        long msTime = System.currentTimeMillis();
-        Date currentDateTime = new Date(msTime);
+        long result;
+        try{
+            ContentValues initialValues = new ContentValues();
+            long msTime = System.currentTimeMillis();
+            Date currentDateTime = new Date(msTime);
 
-        initialValues.put(KEY_TITLE, note.getTitle());
-        initialValues.put(KEY_CONTENT, note.getContent());
-        initialValues.put(KEY_DATE, currentDateTime.toString());
-        initialValues.put(KEY_RATING, note.getRating());
-        return _db.insert(TABLE_NAME, null, initialValues);
+            initialValues.put(KEY_TITLE, note.getTitle());
+            initialValues.put(KEY_CONTENT, note.getContent());
+            initialValues.put(KEY_DATE, currentDateTime.toString());
+            initialValues.put(KEY_RATING, note.getRating());
+            result = _db.insert(TABLE_NAME, null, initialValues);
+        }catch (Exception e){
+            Log.e("problem",e+"");
+            result = -1;
+        }
+        return result;
     }
 
     /**
@@ -103,17 +107,6 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Return a Cursor over the list of all notes in the database
-     *
-     * @return Cursor over all notes
-     */
-    @Override
-    public ArrayList<Note> getAllNotes() {
-
-        return new ArrayList<Note>();
-    }
-
-    /**
      * Return a Cursor positioned at the note that matches the given id
      *
      * @param id id of note to retrieve
@@ -124,6 +117,50 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     public Note getNote(long id) {
 
         return new Note();
+    }
+
+    /**
+     * Return a Cursor over the list of all notes in the database
+     *
+     * @return Cursor over all notes
+     */
+    @Override
+    public ArrayList<Note> getAllNotes() {
+        ArrayList<Note> noteList;
+        String query = "SELECT * FROM "+TABLE_NAME;
+        Cursor cursor = _db.rawQuery(query,null);
+        ArrayList<Note> list=new ArrayList<Note>();
+
+        while(cursor.moveToNext()){
+            Note note=new Note();
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(cursor.getString(2));
+       /*     note.setRating(cursor.getString(2));
+            note.setContent(cursor.getString(2));*/
+
+            list.add(note);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /*Return the number of item in the table */
+    @Override
+    public int getNoteCount() {
+        int num = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        try{
+            String QUERY = "SELECT * FROM "+TABLE_NAME;
+            Cursor cursor = db.rawQuery(QUERY, null);
+            num = cursor.getCount();
+            db.close();
+            return num;
+        }catch (Exception e){
+            Log.e("error", e + "");
+        }
+        return 0;
     }
 
     /**
@@ -150,6 +187,5 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         return _db.update(TABLE_NAME, args, KEY_ID + "=" + id, null) > 0;
     }
-
 
 }
