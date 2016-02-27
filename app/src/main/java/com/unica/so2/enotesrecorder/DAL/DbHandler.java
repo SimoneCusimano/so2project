@@ -2,78 +2,93 @@ package com.unica.so2.enotesrecorder.DAL;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
-import com.unica.so2.enotesrecorder.Helper.DatabaseHelper;
+import com.unica.so2.enotesrecorder.Model.Note;
 
+import java.util.ArrayList;
 import java.util.Date;
 
-public class DbAdapter {
+public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
-    private static final String DATABASE_TABLE = "note";
+    private SQLiteDatabase _db;
+
+    private static final String DB_NAME = "eNotesRecorder";
+    private static final int DB_VERSION = 2;
+    private static final String TABLE_NAME = "note";
+    private static final String DROP_TABLE = String.format("DROP TABLE IF EXISTS %s", TABLE_NAME);
+    private static final String CREATE_TABLE =
+            "create table note (" +
+                    "_id integer primary key autoincrement," +
+                    "title text not null," +
+                    "lastEdit text not null,"+
+                    "content text not null," +
+                    "rating double);" ;
+
+
     public static final String KEY_TITLE = "title";
     public static final String KEY_DATE = "last_edit";
     public static final String KEY_ID = "_id";
     public static final String KEY_CONTENT = "content";
     public static final String KEY_RATING = "rating";
 
-    private DatabaseHelper mDbHelper;
-    private SQLiteDatabase mDb;
-
-    private final Context mCtx;
 
     /**
      * Constructor - takes the context to allow the database to be
      * opened/created
      *
-     * @param ctx the Context within which to work
+     * @param context the Context within which to work
      */
-    public DbAdapter(Context ctx) {
-        this.mCtx = ctx;
+    public DbHandler(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
-    /**
-     * Open the notes database. If it cannot be opened, try to create a new
-     * instance of the database. If it cannot be created, throw an exception to
-     * signal the failure
-     *
-     * @return this (self reference, allowing this to be chained in an
-     *         initialization call)
-     * @throws SQLException if the database could be neither opened or created
-     */
-    public DbAdapter open() throws SQLException {
-        mDbHelper = new DatabaseHelper(mCtx);
-        mDb = mDbHelper.getWritableDatabase();
-        return this;
+    public void open() throws SQLException {
+        _db = this.getWritableDatabase();
     }
 
     public void close() {
-        mDbHelper.close();
+        _db.close();
     }
 
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(DROP_TABLE);
+        onCreate(db);
+    }
+
+    @Override
+    public int getNoteCount() {
+        return 0;
+    }
 
     /**
      * Create a new note using the title and body provided. If the note is
      * successfully created return the new rowId for that note, otherwise return
      * a -1 to indicate failure.
      *
-     * @param title the title of the note
-     * @param content the json content of the note
-     * @param rating the rating of the note
+     * @param note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String content, double rating) {
+    @Override
+    public long addNote(Note note) {
         ContentValues initialValues = new ContentValues();
         long msTime = System.currentTimeMillis();
         Date currentDateTime = new Date(msTime);
 
-        initialValues.put(KEY_TITLE, title);
-        initialValues.put(KEY_CONTENT, content);
+        initialValues.put(KEY_TITLE, note.getTitle());
+        initialValues.put(KEY_CONTENT, note.getContent());
         initialValues.put(KEY_DATE, currentDateTime.toString());
-        initialValues.put(KEY_RATING, rating);
-        return mDb.insert(DATABASE_TABLE, null, initialValues);
+        initialValues.put(KEY_RATING, note.getRating());
+        return _db.insert(TABLE_NAME, null, initialValues);
     }
 
     /**
@@ -82,9 +97,9 @@ public class DbAdapter {
      * @param id id of note to delete
      * @return true if deleted, false otherwise
      */
+    @Override
     public boolean deleteNote(long id) {
-
-        return mDb.delete(DATABASE_TABLE, KEY_ID + "=" + id, null) > 0;
+        return _db.delete(TABLE_NAME, KEY_ID + "=" + id, null) > 0;
     }
 
     /**
@@ -92,10 +107,10 @@ public class DbAdapter {
      *
      * @return Cursor over all notes
      */
-    public Cursor fetchAllNotes() {
+    @Override
+    public ArrayList<Note> getAllNotes() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_ID, KEY_TITLE,
-                KEY_CONTENT,KEY_DATE,KEY_RATING}, null, null, null, null, null);
+        return new ArrayList<Note>();
     }
 
     /**
@@ -105,18 +120,10 @@ public class DbAdapter {
      * @return Cursor positioned to matching note, if found
      * @throws SQLException if note could not be found/retrieved
      */
-    public Cursor fetchNote(long id) throws SQLException {
+    @Override
+    public Note getNote(long id) {
 
-        Cursor mCursor =
-
-                mDb.query(true, DATABASE_TABLE, new String[] {KEY_ID,
-                                KEY_TITLE,KEY_CONTENT,KEY_DATE,KEY_RATING}, KEY_ID + "=" + id, null,
-                        null, null, null, null);
-        if (mCursor != null) {
-            mCursor.moveToFirst();
-        }
-        return mCursor;
-
+        return new Note();
     }
 
     /**
@@ -130,6 +137,7 @@ public class DbAdapter {
      * @param rating value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
+    @Override
     public boolean updateNote(long id, String title, String content, double rating) {
         ContentValues args = new ContentValues();
         long msTime = System.currentTimeMillis();
@@ -140,6 +148,8 @@ public class DbAdapter {
         args.put(KEY_DATE, currentDateTime.toString());
         args.put(KEY_RATING, rating);
 
-        return mDb.update(DATABASE_TABLE, args, KEY_ID + "=" + id, null) > 0;
+        return _db.update(TABLE_NAME, args, KEY_ID + "=" + id, null) > 0;
     }
+
+
 }

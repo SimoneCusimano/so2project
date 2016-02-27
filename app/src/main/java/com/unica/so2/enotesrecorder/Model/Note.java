@@ -2,23 +2,21 @@ package com.unica.so2.enotesrecorder.Model;
 
 import java.util.Date;
 
-/**
- * Created by s.cusimano on 26-Feb-16.
- */
+
 public class Note {
     private String _id;
     private String _title;
-    private String _body;
+    private String _content;
     private Date _lastEdit;
-    private Byte[] _audio;
     private double _rating;
 
-    public Note(String id, String title, String body, Date lastEdit, Byte[] audio, double rating) {
+    public Note(){}
+
+    public Note(String id, String title, String content, Date lastEdit, double rating) {
         this._id = id;
         this._title = title;
-        this._body = body;
+        this._content = content;
         this._lastEdit = lastEdit;
-        this._audio = audio;
         this._rating = rating;
     }
 
@@ -38,12 +36,12 @@ public class Note {
         this._title = title;
     }
 
-    public String getBody() {
-        return _body;
+    public String getContent() {
+        return _content;
     }
 
-    public void setBody(String body) {
-        this._body = body;
+    public void setContent(String content) {
+        this._content = content;
     }
 
     public Date getLastEdit() {
@@ -52,14 +50,6 @@ public class Note {
 
     public void setLastEdit(Date lastEdit) {
         this._lastEdit = lastEdit;
-    }
-
-    public Byte[] getAudio() {
-        return _audio;
-    }
-
-    public void setAudio(Byte[] audio) {
-        this._audio = audio;
     }
 
     public double getRating() {

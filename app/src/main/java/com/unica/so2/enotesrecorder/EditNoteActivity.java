@@ -143,7 +143,7 @@ public class EditNoteActivity extends Activity {
 
     private void populateFields() {
         if (mRowId != null) {
-            note = mDbHelper.fetchNote(mRowId);
+            note = mDbHelper.getNote(mRowId);
             startManagingCursor(note);
             mTitleText.setText(note.getString(
                     note.getColumnIndexOrThrow(DbHandler.KEY_TITLE)));
