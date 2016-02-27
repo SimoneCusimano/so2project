@@ -5,13 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    tools:context="com.unica.so2.enotesrecorder.NewNoteActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -24,14 +23,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <include layout="@layout/note_list" />
-    </FrameLayout>
+    <include layout="@layout/content_note_list" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -39,7 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
-
+        android:src="@android:drawable/ic_menu_save" />
 
 </android.support.design.widget.CoordinatorLayout>

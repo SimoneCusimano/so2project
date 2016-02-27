@@ -29,7 +29,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
 
     public static final String KEY_TITLE = "title";
-    public static final String KEY_DATE = "last_edit";
+    public static final String KEY_LAST_EDIT = "last_edit";
     public static final String KEY_ID = "_id";
     public static final String KEY_CONTENT = "content";
     public static final String KEY_RATING = "rating";
@@ -85,8 +85,8 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         Date currentDateTime = new Date(msTime);
 
         initialValues.put(KEY_TITLE, note.getTitle());
-        initialValues.put(KEY_CONTENT, note.getContent());
-        initialValues.put(KEY_DATE, currentDateTime.toString());
+        initialValues.put(KEY_CONTENT, note.getContent().toString());
+        initialValues.put(KEY_LAST_EDIT, currentDateTime.toString());
         initialValues.put(KEY_RATING, note.getRating());
         return _db.insert(TABLE_NAME, null, initialValues);
     }
@@ -145,7 +145,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         args.put(KEY_TITLE, title);
         args.put(KEY_CONTENT, content);
-        args.put(KEY_DATE, currentDateTime.toString());
+        args.put(KEY_LAST_EDIT, currentDateTime.toString());
         args.put(KEY_RATING, rating);
 
         return _db.update(TABLE_NAME, args, KEY_ID + "=" + id, null) > 0;
