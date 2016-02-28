@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.unica.so2.enotesrecorder.Helper.GenericHelper;
 import com.unica.so2.enotesrecorder.Helper.JsonHelper;
+import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
 import java.util.ArrayList;
@@ -116,8 +118,19 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public Note getNote(long id) {
+        String query = "SELECT * FROM " + TABLE_NAME + "WHERE _id=" + id;
+        Cursor cursor = _db.rawQuery(query,null);
+        Note note = new Note();
+        if(cursor.moveToFirst()) {
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getDouble(4));
 
-        return new Note();
+            cursor.close();
+        }
+        return note;
     }
 
     /**
@@ -136,10 +149,9 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             Note note=new Note();
             note.setId(cursor.getString(0));
             note.setTitle(cursor.getString(1));
-        /*
-            note.setContent((Content)cursor.getString(2));
-            note.setRating(cursor.getString(2));
-            note.setContent(cursor.getString(2));*/
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getDouble(4));
 
             list.add(note);
         }
