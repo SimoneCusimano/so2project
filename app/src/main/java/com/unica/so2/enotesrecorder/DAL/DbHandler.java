@@ -36,7 +36,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     public static final String KEY_ID = "_id";
     public static final String KEY_TITLE = "title";
     public static final String KEY_CONTENT = "content";
-    public static final String KEY_LAST_EDIT = "last_edit";
+    public static final String KEY_LAST_EDIT = "lastEdit";
     public static final String KEY_RATING = "rating";
 
 
