@@ -96,7 +96,7 @@ public class NoteListActivity extends AppCompatActivity {
         // Get all of the notes from the database and create the item list
         DbHandler dbHandler = new DbHandler(this);
         dbHandler.open();
-        ArrayList<Note> notes = dbHandler.getAllNotes();
+        ArrayList<Note> notes = dbHandler.getAllNotesDescendingDate();
         dbHandler.close();
 
         String[] notesArrayList = notes.toArray(new String[notes.size()]);
