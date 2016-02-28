@@ -23,15 +23,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NoteDetailActivity"
-            android:label="@string/title_note_detail"
-            android:parentActivityName=".NoteListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.unica.so2.enotesrecorder.NoteListActivity" />
-        </activity>
-        <activity
             android:name=".NewNoteActivity"
             android:label="@string/title_activity_new_note"
             android:parentActivityName=".NoteListActivity"
