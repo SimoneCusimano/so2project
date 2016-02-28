@@ -1,6 +1,5 @@
 package com.unica.so2.enotesrecorder;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -73,7 +73,7 @@ public class EditNoteActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Updating...", Toast.LENGTH_SHORT).show();
 
-                SaveNote();
+                saveNote();
             }
         });
     }
@@ -81,14 +81,14 @@ public class EditNoteActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        SaveNote();
+        saveNote();
         outState.putSerializable(DbHandler.KEY_ID, _noteId);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        SaveNote();
+        saveNote();
     }
 
     @Override
@@ -101,6 +101,21 @@ public class EditNoteActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.edit_actionbar, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sendMail:
+                sendNoteByEmail();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void FillWidgetsValue() {
@@ -119,7 +134,7 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
-    protected void sendEmail() {
+    protected void sendNoteByEmail() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
         content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
@@ -136,7 +151,7 @@ public class EditNoteActivity extends AppCompatActivity {
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Note: " + _titleEditText.getText().toString());
         emailIntent.putExtra(Intent.EXTRA_TEXT, _descriptionEditText.getText().toString());
-        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".dat";
+        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".eNote";
         FileHelper.writeJsonToFile(filePath, JsonHelper.serializeNote(note), this);
         emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
 
@@ -149,7 +164,7 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
-    private void SaveNote() {
+    private void saveNote() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
         content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
