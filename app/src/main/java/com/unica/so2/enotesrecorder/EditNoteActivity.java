@@ -146,17 +146,17 @@ public class EditNoteActivity extends AppCompatActivity {
         note.setContent(content);
 
 
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        emailIntent.setData(Uri.parse("mailto:"));
-        emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Note: " + _titleEditText.getText().toString());
-        emailIntent.putExtra(Intent.EXTRA_TEXT, _descriptionEditText.getText().toString());
+        Intent sendEmailIntent = new Intent(Intent.ACTION_SEND);
+        sendEmailIntent.setData(Uri.parse("mailto:"));
+        sendEmailIntent.setType("message/rfc822");
+        sendEmailIntent.putExtra(Intent.EXTRA_SUBJECT, "Note: " + _titleEditText.getText().toString());
+        sendEmailIntent.putExtra(Intent.EXTRA_TEXT, _descriptionEditText.getText().toString());
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".eNote";
         FileHelper.writeJsonToFile(filePath, JsonHelper.serializeNote(note), this);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
+        sendEmailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
 
         try {
-            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            startActivity(Intent.createChooser(sendEmailIntent, "Send mail..."));
             finish();
         }
         catch (android.content.ActivityNotFoundException ex) {
