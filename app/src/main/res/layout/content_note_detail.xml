@@ -1,5 +1,4 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -49,37 +48,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
-
-                <ImageButton
-                    android:id="@+id/fastbackwardButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_fast_rewind_black_48dp" />
-
-                <ImageButton
-                    android:id="@+id/playButton"
-                    android:layout_toRightOf="@+id/fastbackwardButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_play_arrow_black_48dp" />
-
-                <ImageButton
-                    android:id="@+id/stopButton"
-                    android:layout_toRightOf="@+id/playButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_stop_black_48dp" />
-
-                <ImageButton
-                    android:id="@+id/fastforwardButton"
-                    android:layout_toRightOf="@+id/stopButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_fast_forward_black_48dp" />
 
             </LinearLayout>
 

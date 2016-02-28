@@ -13,7 +13,7 @@ public interface NoteRepository {
 
     int getNoteCount();
 
-    boolean updateNote(long id, String title, String content, double rating);
+    boolean updateNote(Note note);
 
     boolean deleteNote(long id);
 

@@ -50,33 +50,12 @@
             android:textSize="40sp"
             android:text="00:00:00" />
 
-        <LinearLayout android:orientation="horizontal"
+        <LinearLayout
+            android:id="@+id/buttonsAreaLinearLayout"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal">
-
-            <ImageButton
-                android:id="@+id/recButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/ic_mic_black_48dp" />
-
-            <ImageButton
-                android:id="@+id/stopButton"
-                android:layout_toRightOf="@+id/recButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/ic_stop_black_48dp" />
-
-            <ImageButton
-                android:id="@+id/cancelButton"
-                android:layout_toRightOf="@+id/stopButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/ic_not_interested_black_48dp" />
 
         </LinearLayout>
 

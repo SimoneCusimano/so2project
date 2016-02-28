@@ -1,157 +1,128 @@
 package com.unica.so2.enotesrecorder;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
+import com.unica.so2.enotesrecorder.Helper.AudioHelper;
+import com.unica.so2.enotesrecorder.Model.Content;
+import com.unica.so2.enotesrecorder.Model.Note;
 
-import java.util.Date;
+import java.io.File;
 
 
 public class EditNoteActivity extends Activity {
-    public static String curText = "";
-    private EditText mTitleText;
-    private EditText mBodyText;
-    private Long mRowId;
-
-    private Cursor note;
-
-    private DbHandler mDbHelper;
+    private EditText _titleEditText, _descriptionEditText;
+    private RatingBar _ratingBar;
+    private ImageButton _play, _stop, _fastForward, _fastBackward;
+    private TextView _counterAudio;
+    private Long _noteId;
+    private FloatingActionButton _update;
+    private String _outputFile;
+    private MediaPlayer _mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDbHelper = new DbHandler(this);
-        mDbHelper.open();
-
-        setContentView(R.layout.activity_new_note);
+        setContentView(R.layout.activity_note_new);
+        LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
+        buttonsAreaLinearLayout.addView(findViewById(R.id.editButtonsLinearLayout));
         setTitle(R.string.app_name);
 
-        mTitleText = (EditText) findViewById(R.id.title);
-        //mBodyText = (EditText) findViewById(R.id.content);
+        _mediaPlayer = new MediaPlayer();
+        _titleEditText = (EditText) findViewById(R.id.title);
+        _descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
+        _ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        _play = (ImageButton) findViewById(R.id.playImageButton);
+        _stop = (ImageButton) findViewById(R.id.stopImageButton);
+        _fastForward = (ImageButton) findViewById(R.id.fastForwardImageButton);
+        _fastBackward = (ImageButton) findViewById(R.id.fastBackwardImageButton);
+        _counterAudio = (TextView) findViewById(R.id.timerValueTextView);
+        _update = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
+        _outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
 
 
-        mRowId = (savedInstanceState == null) ? null :
-                (Long) savedInstanceState.getSerializable(DbHandler.KEY_ID);
-        if (mRowId == null) {
+        _noteId = (savedInstanceState == null) ? null : (Long) savedInstanceState.getSerializable(DbHandler.KEY_ID);
+        if (_noteId == null) {
             Bundle extras = getIntent().getExtras();
-            mRowId = extras != null ? extras.getLong(DbHandler.KEY_ID)
-                    : null;
+            _noteId = extras != null ? extras.getLong(DbHandler.KEY_ID) : null;
         }
 
-        populateFields();
+        FillWidgetsValue();
 
+        _update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Updating...", Toast.LENGTH_SHORT).show();
+
+                SaveNote();
+            }
+        });
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        saveState();
-        outState.putSerializable(DbHandler.KEY_ID, mRowId);
+        SaveNote();
+        outState.putSerializable(DbHandler.KEY_ID, _noteId);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        saveState();
+        SaveNote();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        populateFields();
+        FillWidgetsValue();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.noteedit_menu, menu);
-        return true;
-    }
+    private void FillWidgetsValue() {
+        try {
+            DbHandler dbHandler = new DbHandler(this);
+            Note note = dbHandler.getNote(_noteId);
+            dbHandler.close();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        /*switch (item.getItemId()) {
-            case R.id.menu_about:
+            _titleEditText.setText(note.getTitle());
+            _descriptionEditText.setText(note.getContent().getDescription());
+            _ratingBar.setRating(note.getRating());
+            _mediaPlayer.setDataSource(_outputFile);
 
-		    	/* Here is the introduce about myself
-                AlertDialog.Builder dialog = new AlertDialog.Builder(NoteEdit.this);
-                dialog.setTitle("About");
-                dialog.setMessage("Hello! I'm Heng, the creator of this application. This application is created for learning." +
-                                " Using it on trading or any others activity that is related to business is strictly forbidden."
-                                +"If there is any bug is found please freely e-mail me. "+
-                                "\n\tedisonthk@gmail.com"
-                );
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-
-                    }
-                });
-                dialog.show();
-                return true;
-            case R.id.menu_delete:
-                if(note != null){
-                    note.close();
-                    note = null;
-                }
-                if(mRowId != null){
-                    mDbHelper.deleteNote(mRowId);
-                }
-                finish();
-
-                return true;
-            case R.id.menu_save:
-                saveState();
-                finish();
-            default:
-                return super.onOptionsItemSelected(item);
-        }*/
-        return true;
-    }
-
-    private void saveState() {
-        String title = mTitleText.getText().toString();
-        String body = mBodyText.getText().toString();
-
-        long msTime = System.currentTimeMillis();
-        Date currentDateTime = new Date(msTime);
-
-        if(mRowId == null){
-            //long id = mDbHelper.createNote(title, body, currentDateTime,);
-            /*if(id > 0){
-                mRowId = id;
-            }else{
-                Log.e("saveState", "failed to create note");
-            }*/
-        }else{
-            //if(!mDbHelper.updateNote(mRowId, title, body, curDate)){
-            //    Log.e("saveState","failed to update note");
-            //}
+        }
+        catch(Exception e){
+            e.printStackTrace();
         }
     }
 
+    private void SaveNote() {
+        Content content = new Content();
+        content.setDescription(_descriptionEditText.getText().toString());
+        content.setAudio(AudioHelper.encodeFileInString(new File(_outputFile)));
 
-    private void populateFields() {
-        /*if (mRowId != null) {
-            note = mDbHelper.getNote(mRowId);
-            startManagingCursor(note);
-            mTitleText.setText(note.getString(
-                    note.getColumnIndexOrThrow(DbHandler.KEY_TITLE)));
-            mBodyText.setText(note.getString(
-                    note.getColumnIndexOrThrow(DbHandler.KEY_BODY)));
-            curText = note.getString(
-                    note.getColumnIndexOrThrow(DbHandler.KEY_BODY));
-        }*/
+        Note note = new Note();
+        note.setTitle(_titleEditText.getText().toString());
+        note.setRating(_ratingBar.getRating());
+        note.setContent(content);
+
+        DbHandler dbHandler = new DbHandler(this);
+        boolean result = dbHandler.updateNote(note);
+        if (result) {
+            Toast.makeText(getApplicationContext(), "Note Updated", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Unable to Update the Note", Toast.LENGTH_SHORT).show();
+        }
+        dbHandler.close();
     }
 }
