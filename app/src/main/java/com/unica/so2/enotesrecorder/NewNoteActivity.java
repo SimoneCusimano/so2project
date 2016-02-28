@@ -14,7 +14,7 @@ import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
-import com.unica.so2.enotesrecorder.Helper.AudioHelper;
+import com.unica.so2.enotesrecorder.Helper.FileHelper;
 import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
@@ -145,7 +145,7 @@ public class NewNoteActivity extends Activity {
 
                 Content content = new Content();
                 content.setDescription(_descriptionEditText.getText().toString());
-                content.setAudio(AudioHelper.encodeFileInString(new File(_outputFile)));
+                content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
 
                 Note note = new Note();
                 note.setTitle(_titleEditText.getText().toString());

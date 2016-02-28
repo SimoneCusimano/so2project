@@ -2,6 +2,7 @@ package com.unica.so2.enotesrecorder.Helper;
 
 
 import com.unica.so2.enotesrecorder.Model.Content;
+import com.unica.so2.enotesrecorder.Model.Note;
 
 import org.json.JSONObject;
 
@@ -43,4 +44,8 @@ public class JsonHelper {
 
             return content;
         }
+
+    public static String serializeNote(Note note) {
+        return null;
+    }
 }

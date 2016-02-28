@@ -1,5 +1,6 @@
 package com.unica.so2.enotesrecorder.Helper;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -9,9 +10,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
 
-public class AudioHelper {
+public class FileHelper {
 
     public static String encodeFileInString(File file) {
         String encodedString = "";
@@ -62,6 +64,17 @@ public class AudioHelper {
         }
         catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void writeJsonToFile(String filePath, String data, Context context) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(filePath, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 }

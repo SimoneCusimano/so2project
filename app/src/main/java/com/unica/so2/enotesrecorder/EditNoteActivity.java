@@ -1,7 +1,9 @@
 package com.unica.so2.enotesrecorder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -14,7 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
-import com.unica.so2.enotesrecorder.Helper.AudioHelper;
+import com.unica.so2.enotesrecorder.Helper.FileHelper;
+import com.unica.so2.enotesrecorder.Helper.JsonHelper;
 import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
@@ -99,17 +102,46 @@ public class EditNoteActivity extends Activity {
             _descriptionEditText.setText(note.getContent().getDescription());
             _ratingBar.setRating(note.getRating());
             _mediaPlayer.setDataSource(_outputFile);
-
         }
         catch(Exception e){
             e.printStackTrace();
         }
     }
 
+    protected void sendEmail() {
+        Content content = new Content();
+        content.setDescription(_descriptionEditText.getText().toString());
+        content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
+
+        Note note = new Note();
+        String noteTitle = _titleEditText.getText().toString();
+        note.setTitle(noteTitle);
+        note.setRating(_ratingBar.getRating());
+        note.setContent(content);
+
+
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Note: " + _titleEditText.getText().toString());
+        emailIntent.putExtra(Intent.EXTRA_TEXT, _descriptionEditText.getText().toString());
+        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".dat";
+        FileHelper.writeJsonToFile(filePath, JsonHelper.serializeNote(note), this);
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            finish();
+        }
+        catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(EditNoteActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void SaveNote() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
-        content.setAudio(AudioHelper.encodeFileInString(new File(_outputFile)));
+        content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
 
         Note note = new Note();
         note.setTitle(_titleEditText.getText().toString());
@@ -120,7 +152,8 @@ public class EditNoteActivity extends Activity {
         boolean result = dbHandler.updateNote(note);
         if (result) {
             Toast.makeText(getApplicationContext(), "Note Updated", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+        else {
             Toast.makeText(getApplicationContext(), "Unable to Update the Note", Toast.LENGTH_SHORT).show();
         }
         dbHandler.close();
