@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +26,7 @@ import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 
 public class EditNoteActivity extends AppCompatActivity {
@@ -36,6 +38,11 @@ public class EditNoteActivity extends AppCompatActivity {
     private FloatingActionButton _update;
     private String _outputFile;
     private MediaPlayer _mediaPlayer;
+    private double _startTime = 0;
+    private double _finalTime = 0;
+    private int forwardTime = 5000;
+    private int backwardTime = 5000;
+    private Handler _handler = new Handler();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,12 @@ public class EditNoteActivity extends AppCompatActivity {
         _counterAudio = (TextView) findViewById(R.id.timerValueTextView);
         _update = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
         _outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
+        _finalTime = _mediaPlayer.getDuration();
+        _startTime = _mediaPlayer.getCurrentPosition();
 
+        _stop.setEnabled(false);
+        _fastForward.setEnabled(false);
+        _fastBackward.setEnabled(false);
 
         _noteId = (savedInstanceState == null) ? null : (Long) savedInstanceState.getSerializable(DbHandler.KEY_ID);
         if (_noteId == null) {
@@ -76,6 +88,61 @@ public class EditNoteActivity extends AppCompatActivity {
                 saveNote();
             }
         });
+
+        _play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _fastBackward.setEnabled(true);
+                _fastForward.setEnabled(true);
+                _stop.setEnabled(false);
+
+
+                if(_mediaPlayer.isPlaying()){
+                    _play.setImageResource(R.drawable.ic_pause_black_48dp);
+                    _mediaPlayer.pause();
+
+                    _handler.postDelayed(UpdateSongTime, 100);
+                }
+                else {
+                    _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                    _mediaPlayer.start();
+                }
+            }
+        });
+        _stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _stop.setEnabled(false);
+                _fastForward.setEnabled(false);
+                _fastBackward.setEnabled(false);
+                _mediaPlayer.stop();
+            }
+        });
+        _fastBackward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int temp = (int) _startTime;
+
+                if((temp+forwardTime)<= _finalTime){
+                    _startTime = _startTime + forwardTime;
+                    _mediaPlayer.seekTo((int) _startTime);
+                    //Toast.makeText(getApplicationContext(),"You have Jumped forward 5 seconds",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        _fastForward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int temp = (int) _startTime;
+
+                if((temp-backwardTime)>0){
+                    _startTime = _startTime - backwardTime;
+                    _mediaPlayer.seekTo((int) _startTime);
+                    //Toast.makeText(getApplicationContext(),"You have Jumped backward 5 seconds",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -128,6 +195,12 @@ public class EditNoteActivity extends AppCompatActivity {
             _descriptionEditText.setText(note.getContent().getDescription());
             _ratingBar.setRating(note.getRating());
             _mediaPlayer.setDataSource(_outputFile);
+
+            _counterAudio.setText(String.format("%d min, %d sec",
+                            TimeUnit.MILLISECONDS.toMinutes((long) _finalTime),
+                            TimeUnit.MILLISECONDS.toSeconds((long) _finalTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) _finalTime)))
+            );
         }
         catch(Exception e){
             e.printStackTrace();
@@ -184,4 +257,18 @@ public class EditNoteActivity extends AppCompatActivity {
         }
         dbHandler.close();
     }
+
+    private Runnable UpdateSongTime = new Runnable() {
+        public void run() {
+            _startTime = _mediaPlayer.getCurrentPosition();
+            _counterAudio.setText(String.format("%d min, %d sec",
+
+                            TimeUnit.MILLISECONDS.toMinutes((long) _startTime),
+                            TimeUnit.MILLISECONDS.toSeconds((long) _startTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                            toMinutes((long) _startTime)))
+            );
+            _handler.postDelayed(this, 100);
+        }
+    };
 }

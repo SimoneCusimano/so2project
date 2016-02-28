@@ -5,13 +5,14 @@ import android.util.Base64;
 import android.util.Log;
 
 import org.apache.commons.io.FileUtils;
+
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.SequenceInputStream;
+import java.util.List;
 
 public class FileHelper {
 
@@ -40,31 +41,22 @@ public class FileHelper {
         }
     }
 
-    public static void mergeAudios(File audioFileOne, File audioFileTwo, String outputFilePath){
+    public static BufferedOutputStream mergeAudio(List<File> filesToMerge)
+    {
+        BufferedOutputStream bufferedOutputStream = null;
 
         try {
-            FileInputStream streamOne = new FileInputStream(audioFileOne);
-            FileInputStream streamTwo = new FileInputStream(audioFileTwo);
-            SequenceInputStream sequenceInputStream = new SequenceInputStream(streamOne, streamTwo);
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(outputFilePath));
+            for(int i=0; i<filesToMerge.size(); i++) {
 
-            int temp;
-
-            while( (temp = sequenceInputStream.read()) != -1) {
-                fileOutputStream.write(temp);
+                bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(filesToMerge.get(i).getPath()));
             }
+            bufferedOutputStream.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
-            fileOutputStream.close();
-            sequenceInputStream.close();
-            streamOne.close();
-            streamTwo.close();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        return bufferedOutputStream;
     }
 
     public static void writeJsonToFile(String filePath, String data, Context context) {

@@ -18,8 +18,11 @@ import com.unica.so2.enotesrecorder.Helper.FileHelper;
 import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class NewNoteActivity extends Activity {
@@ -29,7 +32,8 @@ public class NewNoteActivity extends Activity {
     FloatingActionButton _save;
     private boolean _isRecording = false; // It handles the Rec/Pause Button state
     private MediaRecorder _mediaRecorder;
-    private String _outputFile = null;
+    private String _currentRecordingPath = null;
+    private ArrayList<File> _filesToMerge = new ArrayList<File>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +43,17 @@ public class NewNoteActivity extends Activity {
         buttonsAreaLinearLayout.addView(findViewById(R.id.newButtonsLinearLayout));
         setContentView(R.layout.activity_note_new);
 
-        _cancel = (ImageButton)findViewById(R.id.cancelImageButton);
-        _stop = (ImageButton)findViewById(R.id.stopImageButton);
-        _record = (ImageButton)findViewById(R.id.recImageButton);
-        _save = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
+        _cancel = (ImageButton) findViewById(R.id.cancelImageButton);
+        _stop = (ImageButton) findViewById(R.id.stopImageButton);
+        _record = (ImageButton) findViewById(R.id.recImageButton);
+        _save = (FloatingActionButton) findViewById(R.id.saveFloatingActionButton);
         _titleEditText = (EditText) findViewById(R.id.title);
         _descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         _ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
         _stop.setEnabled(false);
         _cancel.setEnabled(false);
-        _outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
+        _currentRecordingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/Temp.3gp";
 
 
         _record.setOnClickListener(new View.OnClickListener() {
@@ -60,11 +64,14 @@ public class NewNoteActivity extends Activity {
                         // Pause stuff
                         _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
+                        _mediaRecorder.stop();
+                        _filesToMerge.add(new File(_currentRecordingPath));
+
                     } else {
                         // Recording Mode
                         _record.setImageResource(R.drawable.ic_pause_black_48dp);
 
-                        File directory = new File(_outputFile).getParentFile();
+                        File directory = new File(_currentRecordingPath).getParentFile();
                         if (!directory.exists()) {
                             directory.mkdirs();
                         }
@@ -75,7 +82,7 @@ public class NewNoteActivity extends Activity {
                             _mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                             _mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                             _mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                            _mediaRecorder.setOutputFile(_outputFile);
+                            _mediaRecorder.setOutputFile(_currentRecordingPath);
                         }
 
                         _mediaRecorder.prepare();
@@ -123,8 +130,9 @@ public class NewNoteActivity extends Activity {
                         _mediaRecorder.reset();
                     }
 
-                    File file = new File(_outputFile);
+                    File file = new File(_currentRecordingPath);
                     file.delete();
+                    _filesToMerge.clear();
                     _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
                     _record.setEnabled(true);
@@ -132,7 +140,8 @@ public class NewNoteActivity extends Activity {
                     _cancel.setEnabled(false);
 
                     Toast.makeText(getApplicationContext(), "Recording aborted", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -145,7 +154,8 @@ public class NewNoteActivity extends Activity {
 
                 Content content = new Content();
                 content.setDescription(_descriptionEditText.getText().toString());
-                content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
+                //File file = FileHelper.mergeAudio(_filesToMerge);
+                //content.setAudio(FileHelper.encodeFileInString(new File));
 
                 Note note = new Note();
                 note.setTitle(_titleEditText.getText().toString());
