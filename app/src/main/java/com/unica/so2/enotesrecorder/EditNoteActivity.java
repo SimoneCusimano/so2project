@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,7 +27,7 @@ import com.unica.so2.enotesrecorder.Model.Note;
 import java.io.File;
 
 
-public class EditNoteActivity extends Activity {
+public class EditNoteActivity extends AppCompatActivity {
     private EditText _titleEditText, _descriptionEditText;
     private RatingBar _ratingBar;
     private ImageButton _play, _stop, _fastForward, _fastBackward;
@@ -41,6 +44,8 @@ public class EditNoteActivity extends Activity {
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
         buttonsAreaLinearLayout.addView(findViewById(R.id.editButtonsLinearLayout));
         setTitle(R.string.app_name);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
 
         _mediaPlayer = new MediaPlayer();
         _titleEditText = (EditText) findViewById(R.id.title);
@@ -90,6 +95,12 @@ public class EditNoteActivity extends Activity {
     protected void onResume() {
         super.onResume();
         FillWidgetsValue();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_actionbar, menu);
+        return true;
     }
 
     private void FillWidgetsValue() {

@@ -2,6 +2,7 @@ package com.unica.so2.enotesrecorder.Helper;
 
 
 import com.unica.so2.enotesrecorder.Model.Content;
+import com.unica.so2.enotesrecorder.Model.Note;
 
 import org.json.JSONObject;
 
@@ -75,7 +76,7 @@ public class JsonHelper {
                 note.setTitle(json.getString("title"));
                 note.setContent(deserializeContent(json.getString("content")));
                 note.setLastEdit(GenericHelper.stringToDate(json.getString("lastEdit")));
-                note.setRating(json.getDouble("rating"));
+                note.setRating((float)json.getDouble("rating"));
             }
             catch (Exception e) {
                 e.printStackTrace();
