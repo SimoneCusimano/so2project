@@ -23,15 +23,16 @@ import java.util.ArrayList;
  * An activity representing a list of Notes. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link NoteDetailActivity} representing
+ * lead to a {@link EditNoteActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
 public class NoteListActivity extends AppCompatActivity {
 
-    private static final int ACTIVITY_EDIT=1;
+    private static final int ACTIVITY_EDIT = 0;
     private ListView _notesList;
     private FloatingActionButton _refresh;
+    private int DEFAULT_SORTING;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,8 @@ public class NoteListActivity extends AppCompatActivity {
 
         _refresh = (FloatingActionButton) findViewById(R.id.refreshFloatingActionButton);
         _notesList = (ListView) findViewById(android.R.id.list);
-
-        createListView();
+        DEFAULT_SORTING = R.id.action_sortByLastEditAsc;
+        createListView(DEFAULT_SORTING);
 
         _notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -59,7 +60,7 @@ public class NoteListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-                createListView();
+                createListView(DEFAULT_SORTING);
             }
         });
     }
@@ -72,6 +73,13 @@ public class NoteListActivity extends AppCompatActivity {
                 Intent i = new Intent(this, NewNoteActivity.class);
                 startActivity(i);
                 return true;
+            case R.id.action_sortByLastEditAsc:
+            case R.id.action_sortByLastEditDesc:
+            case R.id.action_sortByRatingAsc:
+            case R.id.action_sortByRatingDesc:
+                createListView(item.getItemId());
+                return true;
+
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -90,24 +98,37 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        createListView();
+        createListView(DEFAULT_SORTING);
     }
 
-    private void createListView() {
+    private void createListView(int choose) {
         // Get all of the notes from the database and create the item list
         DbHandler dbHandler = new DbHandler(this);
         dbHandler.open();
-        ArrayList<Note> notesArrayList = dbHandler.getAllNotesAscendingDate();
+        ArrayList<Note> notesArrayList;
+        switch(choose) {
+            case R.id.action_sortByLastEditAsc:
+                notesArrayList = dbHandler.getAllNotesAscendingDate();
+                break;
+            case R.id.action_sortByLastEditDesc:
+                notesArrayList = dbHandler.getAllNotesDescendingDate();
+                break;
+            case R.id.action_sortByRatingAsc:
+                notesArrayList = dbHandler.getAllNotesAscendingRating();
+                break;
+            case R.id.action_sortByRatingDesc:
+                notesArrayList = dbHandler.getAllNotesDescendingRating();
+                break;
+            default:
+                notesArrayList = dbHandler.getAllNotesAscendingDate();
+                    break;
+        }
+
         dbHandler.close();
 
         // Create the adapter to convert the array to views
         NoteAdapter adapter = new NoteAdapter(this, notesArrayList);
         // Attach the adapter to a ListView
         _notesList.setAdapter(adapter);
-
-
-
-        //String[]  = notes.toArray(new String[notes.size()]);
-        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
     }
 }

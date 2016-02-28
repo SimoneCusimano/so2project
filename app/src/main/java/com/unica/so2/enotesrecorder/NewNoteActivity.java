@@ -44,7 +44,6 @@ public class NewNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_new);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
-
         LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.content_note_new_buttons, null);
         buttonsAreaLinearLayout.addView(ll);
 

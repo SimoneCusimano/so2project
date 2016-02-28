@@ -9,4 +9,10 @@
         android:title="@string/action_new"
         android:icon="@android:drawable/ic_dialog_email" />
 
+    <item
+        android:id="@+id/action_deleteNote"
+        app:showAsAction="always"
+        android:title="@string/action_new"
+        android:icon="@android:drawable/ic_menu_delete" />
+
 </menu>

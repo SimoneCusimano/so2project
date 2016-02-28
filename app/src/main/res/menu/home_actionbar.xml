@@ -8,5 +8,21 @@
         app:showAsAction="always"
         android:title="@string/action_new"
         android:icon="@drawable/ic_add_black_24dp"/>
+    <item
+        android:id="@+id/action_sortByRatingDesc"
+        app:showAsAction="never|withText"
+        android:title="Sort By Rating Desc"/>
+    <item
+        android:id="@+id/action_sortByRatingAsc"
+        app:showAsAction="never|withText"
+        android:title="Sort By Rating Asc"/>
+    <item
+        android:id="@+id/action_sortByLastEditDesc"
+        app:showAsAction="never|withText"
+        android:title="Sort By Last Edit Desc"/>
+    <item
+        android:id="@+id/action_sortByLastEditAsc"
+        app:showAsAction="never|withText"
+        android:title="Sort By Last Edit Asc"/>
 
 </menu>

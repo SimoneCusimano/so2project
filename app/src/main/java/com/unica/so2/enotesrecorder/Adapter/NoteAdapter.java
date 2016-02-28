@@ -13,6 +13,7 @@ import com.unica.so2.enotesrecorder.R;
 import java.util.ArrayList;
 
 public class NoteAdapter extends ArrayAdapter<Note> {
+
     public NoteAdapter(Context context, ArrayList<Note> users) {
         super(context, 0, users);
     }

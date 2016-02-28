@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,20 +43,21 @@ public class EditNoteActivity extends AppCompatActivity {
     private double _finalTime = 0;
     private int forwardTime = 5000;
     private int backwardTime = 5000;
-    private Handler _handler = new Handler();;
+    private Handler _handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_new);
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
-        buttonsAreaLinearLayout.addView(findViewById(R.id.editButtonsLinearLayout));
+        LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.content_note_edit_buttons, null);
+        buttonsAreaLinearLayout.addView(ll);
         setTitle(R.string.app_name);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
         _mediaPlayer = new MediaPlayer();
-        _titleEditText = (EditText) findViewById(R.id.title);
+        _titleEditText = (EditText) findViewById(R.id.titleEditText);
         _descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         _ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         _play = (ImageButton) findViewById(R.id.playImageButton);
@@ -177,6 +179,17 @@ public class EditNoteActivity extends AppCompatActivity {
                 sendNoteByEmail();
                 return true;
 
+            case R.id.action_deleteNote:
+                DbHandler dbHandler = new DbHandler(this);
+                dbHandler.open();
+                dbHandler.deleteNote(_noteId);
+                dbHandler.close();
+
+                Intent i = new Intent(this, NoteListActivity.class);
+                startActivity(i);
+
+                return true;
+
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -188,6 +201,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private void FillWidgetsValue() {
         try {
             DbHandler dbHandler = new DbHandler(this);
+            dbHandler.open();
             Note note = dbHandler.getNote(_noteId);
             dbHandler.close();
 
@@ -196,11 +210,10 @@ public class EditNoteActivity extends AppCompatActivity {
             _ratingBar.setRating(note.getRating());
             _mediaPlayer.setDataSource(_outputFile);
 
-            _counterAudio.setText(String.format("%d min, %d sec",
+            _counterAudio.setText(
+                    String.format("%d min, %d sec",
                             TimeUnit.MILLISECONDS.toMinutes((long) _finalTime),
-                            TimeUnit.MILLISECONDS.toSeconds((long) _finalTime) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) _finalTime)))
-            );
+                            TimeUnit.MILLISECONDS.toSeconds((long) _finalTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) _finalTime))));
         }
         catch(Exception e){
             e.printStackTrace();
@@ -261,13 +274,10 @@ public class EditNoteActivity extends AppCompatActivity {
     private Runnable UpdateSongTime = new Runnable() {
         public void run() {
             _startTime = _mediaPlayer.getCurrentPosition();
-            _counterAudio.setText(String.format("%d min, %d sec",
-
-                            TimeUnit.MILLISECONDS.toMinutes((long) _startTime),
-                            TimeUnit.MILLISECONDS.toSeconds((long) _startTime) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
-                                            toMinutes((long) _startTime)))
-            );
+            _counterAudio.setText(
+                    String.format("%d min, %d sec",
+                    TimeUnit.MILLISECONDS.toMinutes((long) _startTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) _startTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) _startTime))));
             _handler.postDelayed(this, 100);
         }
     };

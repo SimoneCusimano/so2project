@@ -3,4 +3,5 @@
     <string name="title_note_detail">Note Detail</string>
     <string name="action_new">New</string>
     <string name="title_activity_new_note">NewNoteActivity</string>
+    <string name="title_activity_edit_note">Edit Note</string>
 </resources>

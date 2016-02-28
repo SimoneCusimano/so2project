@@ -33,6 +33,16 @@
         </activity>
 
         <activity
+            android:name=".EditNoteActivity"
+            android:label="@string/title_activity_edit_note"
+            android:parentActivityName=".NoteListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.unica.so2.enotesrecorder.NoteListActivity" />
+        </activity>
+
+        <activity
             android:name=".ImportNoteActivity"
             android:parentActivityName=".NoteListActivity"
             android:theme="@style/AppTheme.NoActionBar">

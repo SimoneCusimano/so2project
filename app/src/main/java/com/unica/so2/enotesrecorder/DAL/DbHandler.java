@@ -152,7 +152,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public Note getNote(long id) {
-        String query = "SELECT * FROM " + TABLE_NAME + "WHERE _id=" + id;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE _id=" + id;
         Cursor cursor = _db.rawQuery(query, null);
         Note note = new Note();
         if(cursor.moveToFirst()) {
@@ -164,6 +164,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
             cursor.close();
         }
+
         return note;
     }
 
