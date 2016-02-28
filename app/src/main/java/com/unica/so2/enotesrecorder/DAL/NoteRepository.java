@@ -9,7 +9,15 @@ public interface NoteRepository {
 
     long addNote(Note note);
 
-    ArrayList<Note> getAllNotes();
+    ArrayList<Note> getAllNotesDescendingDate();
+
+    ArrayList<Note> getAllNotesAscendingDate();
+
+    ArrayList<Note> getAllNotesDescendingRating();
+
+    ArrayList<Note> getAllNotesAscendingRating();
+
+    ArrayList<Note> getAllNotesByRate(float rating);
 
     int getNoteCount();
 

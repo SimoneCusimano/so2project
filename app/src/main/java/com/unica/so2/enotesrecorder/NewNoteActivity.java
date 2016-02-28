@@ -34,10 +34,11 @@ public class NewNoteActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_note_new);
+
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
         buttonsAreaLinearLayout.addView(findViewById(R.id.newButtonsLinearLayout));
-        setContentView(R.layout.activity_note_new);
 
         _cancel = (ImageButton)findViewById(R.id.cancelImageButton);
         _stop = (ImageButton)findViewById(R.id.stopImageButton);

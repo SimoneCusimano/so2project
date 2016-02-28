@@ -115,6 +115,26 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
+     * Update the note using the note provided. The note to be updated is
+     * specified using the id, and it is altered to use the values passed in
+     *
+     * @return true if the note was successfully updated, false otherwise
+     */
+    @Override
+    public boolean updateNote(Note note) {
+        ContentValues args = new ContentValues();
+        long msTime = System.currentTimeMillis();
+        Date currentDateTime = new Date(msTime);
+
+        args.put(KEY_TITLE, note.getTitle());
+        args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
+        args.put(KEY_LAST_EDIT, currentDateTime.toString());
+        args.put(KEY_RATING, note.getRating());
+
+        return _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
+    }
+
+    /**
      * Return the Note that matches the given id
      *
      * @param id id of note to retrieve
@@ -123,7 +143,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     @Override
     public Note getNote(long id) {
         String query = "SELECT * FROM " + TABLE_NAME + "WHERE _id=" + id;
-        Cursor cursor = _db.rawQuery(query,null);
+        Cursor cursor = _db.rawQuery(query, null);
         Note note = new Note();
         if(cursor.moveToFirst()) {
             note.setId(cursor.getString(0));
@@ -138,14 +158,125 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Return the list of all notes in the database
+     * Return the list of all notes in the database, order by date in descending order
+     * and then by title in ascending order
      *
      * @return ArrayList<Note> of all the notes
      */
-    @Override
-    public ArrayList<Note> getAllNotes() {
+    public ArrayList<Note> getAllNotesDescendingDate() {
         ArrayList<Note> noteList;
-        String query = "SELECT * FROM "+TABLE_NAME;
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + " DESC," + KEY_TITLE + " ASC";
+
+        Cursor cursor = _db.rawQuery(query,null);
+        ArrayList<Note> list= new ArrayList<>();
+
+        while(cursor.moveToNext()){
+            Note note=new Note();
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getFloat(4));
+
+            list.add(note);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * Return the list of all notes in the database, order by date in descending order
+     * and then by title in ascending order
+     *
+     * @return ArrayList<Note> of all the notes
+     */
+    public ArrayList<Note> getAllNotesAscendingDate() {
+        ArrayList<Note> noteList;
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + "," + KEY_TITLE + " ASC";
+
+        Cursor cursor = _db.rawQuery(query,null);
+        ArrayList<Note> list= new ArrayList<>();
+
+        while(cursor.moveToNext()){
+            Note note=new Note();
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getFloat(4));
+
+            list.add(note);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * Return the list of all notes in the database, order by date in descending order
+     * and then by title in ascending order
+     *
+     * @return ArrayList<Note> of all the notes
+     */
+    public ArrayList<Note> getAllNotesDescendingRating() {
+        ArrayList<Note> noteList;
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " DESC";
+
+        Cursor cursor = _db.rawQuery(query,null);
+        ArrayList<Note> list= new ArrayList<>();
+
+        while(cursor.moveToNext()){
+            Note note=new Note();
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getFloat(4));
+
+            list.add(note);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * Return the list of all notes in the database, order by rating in descending order
+     *
+     * @return ArrayList<Note> of all the notes
+     */
+    public ArrayList<Note> getAllNotesAscendingRating() {
+        ArrayList<Note> noteList;
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " ASC";
+
+        Cursor cursor = _db.rawQuery(query,null);
+        ArrayList<Note> list= new ArrayList<>();
+
+        while(cursor.moveToNext()){
+            Note note=new Note();
+            note.setId(cursor.getString(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+            note.setRating(cursor.getFloat(4));
+
+            list.add(note);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * Return the list of all notes in the database, order by rating in descending order
+     *
+     * @return ArrayList<Note> of all the notes
+     */
+    public ArrayList<Note> getAllNotesByRate(float rating) {
+        ArrayList<Note> noteList;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_RATING + " = " + rating;
+
         Cursor cursor = _db.rawQuery(query,null);
         ArrayList<Note> list= new ArrayList<>();
 
@@ -186,24 +317,5 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         return count;
     }
 
-    /**
-     * Update the note using the note provided. The note to be updated is
-     * specified using the id, and it is altered to use the values passed in
-     *
-     * @return true if the note was successfully updated, false otherwise
-     */
-    @Override
-    public boolean updateNote(Note note) {
-        ContentValues args = new ContentValues();
-        long msTime = System.currentTimeMillis();
-        Date currentDateTime = new Date(msTime);
-
-        args.put(KEY_TITLE, note.getTitle());
-        args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
-        args.put(KEY_LAST_EDIT, currentDateTime.toString());
-        args.put(KEY_RATING, note.getRating());
-
-        return _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
-    }
 
 }
