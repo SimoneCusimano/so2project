@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/editButtonsLinearLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/fastBackwardImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/ic_fast_rewind_black_48dp" />
+
+    <ImageButton
+        android:id="@+id/playImageButton"
+        android:layout_toRightOf="@+id/fastBackwardImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/ic_play_arrow_black_48dp" />
+
+    <ImageButton
+        android:id="@+id/stopImageButton"
+        android:layout_toRightOf="@+id/playImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/ic_stop_black_48dp" />
+
+    <ImageButton
+        android:id="@+id/fastForwardImageButton"
+        android:layout_toRightOf="@+id/stopImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/ic_fast_forward_black_48dp" />
+
+</LinearLayout>

@@ -28,36 +28,23 @@ import java.util.ArrayList;
  */
 public class NoteListActivity extends AppCompatActivity {
 
-    private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
-
-    private static final int DELETE_ID = Menu.FIRST;
-
-    private DbHandler _dbHandler;
     private ListView _notesList;
+    private FloatingActionButton _refresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_list);
-        _dbHandler = new DbHandler(this);
-
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
+        _refresh = (FloatingActionButton) findViewById(R.id.fab);
+        _notesList = (ListView) findViewById(android.R.id.list);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        createListView();
 
-        createList();
         _notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(parent.getContext(), EditNoteActivity.class);
@@ -66,14 +53,14 @@ public class NoteListActivity extends AppCompatActivity {
 
             }
         });
-        //registerForContextMenu(getListView());
-        /*Button addNoteButton = (Button)findViewById(R.id.action_new);
-        addNoteButton.setOnClickListener(new View.OnClickListener() {
+
+        _refresh.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                createNote();
+            public void onClick(View view) {
+                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+                createListView();
             }
-        });*/
+        });
     }
 
     @Override
@@ -93,46 +80,27 @@ public class NoteListActivity extends AppCompatActivity {
         }
     }
 
-    private void createNote() {
-        Intent i = new Intent(this, EditNoteActivity.class);
-        startActivityForResult(i, ACTIVITY_CREATE);
-    }
-
-    private void createList() {
-        // Get all of the notes from the database and create the item list
-        _dbHandler.open();
-        ArrayList<Note> notes = _dbHandler.getAllNotes();
-        String[] notesArrayList = notes.toArray(new String[notes.size()]);
-        _dbHandler.close();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
-        _notesList = (ListView) findViewById(android.R.id.list);
-        _notesList.setAdapter(adapter);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.homeactionbar, menu);
         return true;
     }
 
-    /*
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case DELETE_ID:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                _dbHandler.deleteNote(info.id);
-                createList();
-                return true;
-        }
-        return super.onContextItemSelected(item);
-    }
-    */
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        createList();
+        createListView();
+    }
+
+    private void createListView() {
+        // Get all of the notes from the database and create the item list
+        DbHandler dbHandler = new DbHandler(this);
+        dbHandler.open();
+        ArrayList<Note> notes = dbHandler.getAllNotes();
+        dbHandler.close();
+
+        String[] notesArrayList = notes.toArray(new String[notes.size()]);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
+        _notesList.setAdapter(adapter);
     }
 }

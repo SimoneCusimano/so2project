@@ -172,24 +172,20 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * specified using the id, and it is altered to use the title and body
      * values passed in
      *
-     * @param id id of note to update
-     * @param title value to set note title to
-     * @param content value to set note json content to
-     * @param rating value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
     @Override
-    public boolean updateNote(long id, String title, String content, double rating) {
+    public boolean updateNote(Note note) {
         ContentValues args = new ContentValues();
         long msTime = System.currentTimeMillis();
         Date currentDateTime = new Date(msTime);
 
-        args.put(KEY_TITLE, title);
-        args.put(KEY_CONTENT, content);
+        args.put(KEY_TITLE, note.getTitle());
+        args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
         args.put(KEY_LAST_EDIT, currentDateTime.toString());
-        args.put(KEY_RATING, rating);
+        args.put(KEY_RATING, note.getRating());
 
-        return _db.update(TABLE_NAME, args, KEY_ID + "=" + id, null) > 0;
+        return _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
     }
 
 }

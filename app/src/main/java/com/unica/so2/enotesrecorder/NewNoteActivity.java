@@ -7,141 +7,160 @@ import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.Toast;
+
+import com.unica.so2.enotesrecorder.DAL.DbHandler;
+import com.unica.so2.enotesrecorder.Helper.AudioHelper;
+import com.unica.so2.enotesrecorder.Model.Content;
+import com.unica.so2.enotesrecorder.Model.Note;
 
 import java.io.File;
 import java.io.IOException;
 
 
 public class NewNoteActivity extends Activity {
-    ImageButton cancel,stop,record;
-    FloatingActionButton save;
-    private boolean isRecording = false; // It handles the Rec/Pause Button state
-    private MediaRecorder myAudioRecorder;
-    private String outputFile = null;
+    ImageButton _cancel, _stop, _record;
+    private EditText _titleEditText, _descriptionEditText;
+    private RatingBar _ratingBar;
+    FloatingActionButton _save;
+    private boolean _isRecording = false; // It handles the Rec/Pause Button state
+    private MediaRecorder _mediaRecorder;
+    private String _outputFile = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        setContentView(R.layout.activity_new_note);
+        LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
+        buttonsAreaLinearLayout.addView(findViewById(R.id.newButtonsLinearLayout));
+        setContentView(R.layout.activity_note_new);
 
-        cancel = (ImageButton)findViewById(R.id.cancelButton);
-        stop = (ImageButton)findViewById(R.id.stopButton);
-        record = (ImageButton)findViewById(R.id.recButton);
-        save = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
+        _cancel = (ImageButton)findViewById(R.id.cancelImageButton);
+        _stop = (ImageButton)findViewById(R.id.stopImageButton);
+        _record = (ImageButton)findViewById(R.id.recImageButton);
+        _save = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
+        _titleEditText = (EditText) findViewById(R.id.title);
+        _descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
+        _ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
-        stop.setEnabled(false);
-        cancel.setEnabled(false);
-        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
+        _stop.setEnabled(false);
+        _cancel.setEnabled(false);
+        _outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
 
 
-        record.setOnClickListener(new View.OnClickListener() {
+        _record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try
-                {
-                    if (isRecording)
-                    {
+                try {
+                    if (_isRecording) {
                         // Pause stuff
-                        record.setImageResource(R.drawable.ic_mic_black_48dp);
-                    }
-                    else
-                    {
-                        // Recording Mode
-                        record.setImageResource(R.drawable.ic_pause_black_48dp);
+                        _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
-                        File directory = new File(outputFile).getParentFile();
-                        if (!directory.exists())
-                        {
+                    } else {
+                        // Recording Mode
+                        _record.setImageResource(R.drawable.ic_pause_black_48dp);
+
+                        File directory = new File(_outputFile).getParentFile();
+                        if (!directory.exists()) {
                             directory.mkdirs();
                         }
 
-                        // Check if myAudioRecorder has been aborted (Cancel Event) and it needs to be reconfigured
-                        if (myAudioRecorder == null)
-                        {
-                            myAudioRecorder = new MediaRecorder();
-                            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                            myAudioRecorder.setOutputFile(outputFile);
+                        // Check if _mediaRecorder has been aborted (Cancel Event) and it needs to be reconfigured
+                        if (_mediaRecorder == null) {
+                            _mediaRecorder = new MediaRecorder();
+                            _mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                            _mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                            _mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                            _mediaRecorder.setOutputFile(_outputFile);
                         }
 
-                        myAudioRecorder.prepare();
-                        myAudioRecorder.start();
+                        _mediaRecorder.prepare();
+                        _mediaRecorder.start();
 
-                        stop.setEnabled(true);
-                        cancel.setEnabled(true);
+                        _stop.setEnabled(true);
+                        _cancel.setEnabled(true);
 
                         Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT).show();
                     }
 
-                    isRecording = !isRecording;
-                }
-                catch (IOException e)
-                {
+                    _isRecording = !_isRecording;
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        stop.setOnClickListener(new View.OnClickListener() {
+        _stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try
-                {
-                    myAudioRecorder.stop();
-                    myAudioRecorder.release();
-                    myAudioRecorder = null;
-                    record.setImageResource(R.drawable.ic_mic_black_48dp);
+                try {
+                    _mediaRecorder.stop();
+                    _mediaRecorder.release();
+                    _mediaRecorder = null;
+                    _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
-                    record.setEnabled(false);
-                    stop.setEnabled(false);
-                    cancel.setEnabled(true);
+                    _record.setEnabled(false);
+                    _stop.setEnabled(false);
+                    _cancel.setEnabled(true);
 
                     Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_SHORT).show();
                 }
-                catch (IllegalStateException e)
-                {
+                catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        cancel.setOnClickListener(new View.OnClickListener() {
+        _cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try
-                {
-                    if(myAudioRecorder != null)
-                    {
-                        myAudioRecorder.reset();
+                try {
+                    if (_mediaRecorder != null) {
+                        _mediaRecorder.reset();
                     }
 
-                    File file = new File(outputFile);
+                    File file = new File(_outputFile);
                     file.delete();
-                    record.setImageResource(R.drawable.ic_mic_black_48dp);
+                    _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
-                    record.setEnabled(true);
-                    stop.setEnabled(false);
-                    cancel.setEnabled(false);
+                    _record.setEnabled(true);
+                    _stop.setEnabled(false);
+                    _cancel.setEnabled(false);
 
                     Toast.makeText(getApplicationContext(), "Recording aborted", Toast.LENGTH_SHORT).show();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        save.setOnClickListener(new View.OnClickListener() {
+        _save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Saving...", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(getApplicationContext(), "Note saved", Toast.LENGTH_SHORT).show();
+                Content content = new Content();
+                content.setDescription(_descriptionEditText.getText().toString());
+                content.setAudio(AudioHelper.encodeFileInString(new File(_outputFile)));
 
+                Note note = new Note();
+                note.setTitle(_titleEditText.getText().toString());
+                note.setRating(_ratingBar.getRating());
+                note.setContent(content);
+
+                DbHandler dbHandler = new DbHandler(v.getContext());
+                long result = dbHandler.addNote(note);
+                if(result != -1) {
+                    Toast.makeText(getApplicationContext(), "Note Created", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Unable to Create the Note", Toast.LENGTH_SHORT).show();
+                }
+                dbHandler.close();
             }
         });
     }

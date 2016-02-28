@@ -8,11 +8,11 @@ public class Note {
     private String _title;
     private Content _content;
     private Date _lastEdit;
-    private double _rating;
+    private float _rating;
 
     public Note(){}
 
-    public Note(String id, String title, Content content, Date lastEdit, double rating) {
+    public Note(String id, String title, Content content, Date lastEdit, float rating) {
         this._id = id;
         this._title = title;
         this._content = content;
@@ -52,11 +52,11 @@ public class Note {
         this._lastEdit = lastEdit;
     }
 
-    public double getRating() {
+    public float getRating() {
         return _rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(float rating) {
         this._rating = rating;
     }
 }
