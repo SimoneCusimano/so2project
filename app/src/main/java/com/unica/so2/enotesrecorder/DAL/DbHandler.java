@@ -28,15 +28,15 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             "create table note (" +
                     "_id integer primary key autoincrement," +
                     "title text not null," +
-                    "lastEdit text not null,"+
                     "content text not null," +
+                    "lastEdit text not null,"+
                     "rating double);" ;
 
 
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_LAST_EDIT = "last_edit";
     public static final String KEY_ID = "_id";
+    public static final String KEY_TITLE = "title";
     public static final String KEY_CONTENT = "content";
+    public static final String KEY_LAST_EDIT = "last_edit";
     public static final String KEY_RATING = "rating";
 
 
@@ -50,10 +50,15 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+    /**
+     * This method opens the database
+     */
     public void open() throws SQLException {
         _db = this.getWritableDatabase();
     }
-
+    /**
+     * This method closes the database
+     */
     public void close() {
         _db.close();
     }
@@ -71,12 +76,12 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Create a new note using the title and body provided. If the note is
-     * successfully created return the new rowId for that note, otherwise return
+     * Create a new note in the database, using the note provided. If the note is
+     * successfully created return the new id of that note, otherwise return
      * a -1 to indicate failure.
      *
      * @param note note to add
-     * @return rowId or -1 if failed
+     * @return id or -1 if failed
      */
     @Override
     public long addNote(Note note) {
@@ -99,7 +104,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Delete the note with the given Id
+     * Delete from the database the note with the given id
      *
      * @param id id of note to delete
      * @return true if deleted, false otherwise
@@ -110,11 +115,10 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Return a Cursor positioned at the note that matches the given id
+     * Return the Note that matches the given id
      *
      * @param id id of note to retrieve
-     * @return Cursor positioned to matching note, if found
-     * @throws SQLException if note could not be found/retrieved
+     * @return Note with the given id
      */
     @Override
     public Note getNote(long id) {
@@ -126,7 +130,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getDouble(4));
+            note.setRating(cursor.getFloat(4));
 
             cursor.close();
         }
@@ -134,9 +138,9 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Return a Cursor over the list of all notes in the database
+     * Return the list of all notes in the database
      *
-     * @return Cursor over all notes
+     * @return ArrayList<Note> of all the notes
      */
     @Override
     public ArrayList<Note> getAllNotes() {
@@ -151,7 +155,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getDouble(4));
+            note.setRating(cursor.getFloat(4));
 
             list.add(note);
         }
@@ -160,29 +164,31 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         return list;
     }
 
-    /*Return the number of item in the table */
+    /**
+     * Return the number of notes in the table of the database
+     *
+     * @return int the number of notes
+     */
     @Override
     public int getNoteCount() {
         int count = 0;
-        SQLiteDatabase db = this.getReadableDatabase();
 
         try{
             String QUERY = "SELECT * FROM " + TABLE_NAME;
-            Cursor cursor = db.rawQuery(QUERY, null);
+            Cursor cursor = _db.rawQuery(QUERY, null);
             count = cursor.getCount();
-            db.close();
+            cursor.close();
+
         }
         catch (Exception e){
             Log.e("error", e + "");
         }
-
         return count;
     }
 
     /**
-     * Update the note using the details provided. The note to be updated is
-     * specified using the id, and it is altered to use the title and body
-     * values passed in
+     * Update the note using the note provided. The note to be updated is
+     * specified using the id, and it is altered to use the values passed in
      *
      * @return true if the note was successfully updated, false otherwise
      */
