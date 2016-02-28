@@ -13,8 +13,10 @@ import com.unica.so2.enotesrecorder.Helper.JsonHelper;
 import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
@@ -86,14 +88,18 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     @Override
     public long addNote(Note note) {
         long result;
-        try{
+        try {
             ContentValues initialValues = new ContentValues();
             long msTime = System.currentTimeMillis();
             Date currentDateTime = new Date(msTime);
 
             initialValues.put(KEY_TITLE, note.getTitle());
             initialValues.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
-            initialValues.put(KEY_LAST_EDIT, currentDateTime.toString());
+
+            SimpleDateFormat dateFormat =  new SimpleDateFormat("dd MM dd yyyy - HH:mm:ss", Locale.ITALY);
+            String lastEditString = dateFormat.format(currentDateTime);
+
+            initialValues.put(KEY_LAST_EDIT, lastEditString);
             initialValues.put(KEY_RATING, note.getRating());
             result = _db.insert(TABLE_NAME, null, initialValues);
         }catch (Exception e){
@@ -128,7 +134,11 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         args.put(KEY_TITLE, note.getTitle());
         args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
-        args.put(KEY_LAST_EDIT, currentDateTime.toString());
+
+        SimpleDateFormat dateFormat =  new SimpleDateFormat("dd MM dd yyyy - HH:mm:ss", Locale.ITALY);
+        String lastEditString = dateFormat.format(currentDateTime);
+
+        args.put(KEY_LAST_EDIT, lastEditString);
         args.put(KEY_RATING, note.getRating());
 
         return _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
@@ -164,14 +174,13 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * @return ArrayList<Note> of all the notes
      */
     public ArrayList<Note> getAllNotesDescendingDate() {
-        ArrayList<Note> noteList;
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + " DESC," + KEY_TITLE + " ASC";
 
         Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list= new ArrayList<>();
+        ArrayList<Note> list = new ArrayList<>();
 
-        while(cursor.moveToNext()){
-            Note note=new Note();
+        while(cursor.moveToNext()) {
+            Note note = new Note();
             note.setId(cursor.getString(0));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
@@ -192,14 +201,13 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * @return ArrayList<Note> of all the notes
      */
     public ArrayList<Note> getAllNotesAscendingDate() {
-        ArrayList<Note> noteList;
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + "," + KEY_TITLE + " ASC";
 
         Cursor cursor = _db.rawQuery(query,null);
         ArrayList<Note> list= new ArrayList<>();
 
         while(cursor.moveToNext()){
-            Note note=new Note();
+            Note note = new Note();
             note.setId(cursor.getString(0));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
