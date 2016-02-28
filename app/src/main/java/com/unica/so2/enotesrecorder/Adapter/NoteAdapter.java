@@ -25,10 +25,17 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_note, parent, false);
         }
+
         // Lookup view for data population
-        TextView tvName = (TextView) convertView.findViewById(R.id.titleTextView);
+        TextView titleTextView = (TextView) convertView.findViewById(R.id.titleTextView);
+        //TextView lastEditTextView = (TextView) convertView.findViewById(R.id.lastEditTextView);
+        TextView ratingTextView = (TextView) convertView.findViewById(R.id.ratingTextView);
+
         // Populate the data into the template view using the data object
-        tvName.setText(note.getTitle());
+        titleTextView.setText(note.getTitle());
+        //lastEditTextView.setText(note.getLastEdit().toString());
+        ratingTextView.setText(Float.toString(note.getRating()));
+
         // Return the completed view to render on screen
         return convertView;
     }
