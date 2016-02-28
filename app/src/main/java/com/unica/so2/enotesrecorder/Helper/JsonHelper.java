@@ -6,12 +6,13 @@ import com.unica.so2.enotesrecorder.Model.Note;
 
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-
 public class JsonHelper {
 
-        /*serialization: from Content to Json string*/
+       /** This method implements the serialization from the Content, passed as parameter,
+        *  to a Json String
+        *
+        * @return String, throws an exception otherwise
+        * */
         public static String serializeContent(Content content) {
 
             String jsonString = "";
@@ -29,7 +30,11 @@ public class JsonHelper {
             return jsonString;
         }
 
-        // deserialization: from Json string to Content
+    /** This method implements the deserialization from a String, passed as parameter,
+     *  to a Content
+     *
+     * @return Content, throws an exception otherwise
+     * */
         public static Content deserializeContent(String jsonString) {
             Content content = new Content();
 
@@ -44,8 +49,13 @@ public class JsonHelper {
 
             return content;
         }
-    
-        /*serialization: from Note to Json string*/
+
+
+    /** This method implements the serialization from the Note, passed as parameter,
+     *  to a Json String
+     *
+     * @return String of the jsonObject created, throws an exception otherwise
+     * */
         public static String serializeNote(Note note) {
     
             String jsonString = "";
@@ -65,9 +75,14 @@ public class JsonHelper {
     
             return jsonString;
         }
-    
-        // deserialization: from Json string to Note
-        public static Note deserializeNote(String jsonString) {
+
+
+    /** This method implements the deserialization from the json String, passed as parameter,
+     *  to a Note
+     *
+     * @return Note , throws an exception otherwise
+     * */
+    public static Note deserializeNote(String jsonString) {
             Note note = new Note();
     
             try {
