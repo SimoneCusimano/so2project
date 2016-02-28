@@ -30,7 +30,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
                     "title text not null," +
                     "content text not null," +
                     "lastEdit text not null,"+
-                    "rating double);" ;
+                    "rating float);" ;
 
 
     public static final String KEY_ID = "_id";

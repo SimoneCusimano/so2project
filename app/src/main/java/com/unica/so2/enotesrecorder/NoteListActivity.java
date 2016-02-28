@@ -40,7 +40,7 @@ public class NoteListActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
-        _refresh = (FloatingActionButton) findViewById(R.id.fab);
+        _refresh = (FloatingActionButton) findViewById(R.id.refreshFloatingActionButton);
         _notesList = (ListView) findViewById(android.R.id.list);
 
         createListView();
