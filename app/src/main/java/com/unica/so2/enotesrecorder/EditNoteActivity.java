@@ -1,12 +1,15 @@
 package com.unica.so2.enotesrecorder;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,7 +27,7 @@ import com.unica.so2.enotesrecorder.Model.Note;
 import java.io.File;
 
 
-public class EditNoteActivity extends Activity {
+public class EditNoteActivity extends AppCompatActivity {
     private EditText _titleEditText, _descriptionEditText;
     private RatingBar _ratingBar;
     private ImageButton _play, _stop, _fastForward, _fastBackward;
@@ -41,6 +44,8 @@ public class EditNoteActivity extends Activity {
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
         buttonsAreaLinearLayout.addView(findViewById(R.id.editButtonsLinearLayout));
         setTitle(R.string.app_name);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
 
         _mediaPlayer = new MediaPlayer();
         _titleEditText = (EditText) findViewById(R.id.title);
@@ -68,7 +73,7 @@ public class EditNoteActivity extends Activity {
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Updating...", Toast.LENGTH_SHORT).show();
 
-                SaveNote();
+                saveNote();
             }
         });
     }
@@ -76,20 +81,41 @@ public class EditNoteActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        SaveNote();
+        saveNote();
         outState.putSerializable(DbHandler.KEY_ID, _noteId);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        SaveNote();
+        saveNote();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         FillWidgetsValue();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_actionbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sendMail:
+                sendNoteByEmail();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void FillWidgetsValue() {
@@ -108,7 +134,7 @@ public class EditNoteActivity extends Activity {
         }
     }
 
-    protected void sendEmail() {
+    protected void sendNoteByEmail() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
         content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
@@ -125,7 +151,7 @@ public class EditNoteActivity extends Activity {
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Note: " + _titleEditText.getText().toString());
         emailIntent.putExtra(Intent.EXTRA_TEXT, _descriptionEditText.getText().toString());
-        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".dat";
+        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/" + noteTitle + ".eNote";
         FileHelper.writeJsonToFile(filePath, JsonHelper.serializeNote(note), this);
         emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
 
@@ -138,7 +164,7 @@ public class EditNoteActivity extends Activity {
         }
     }
 
-    private void SaveNote() {
+    private void saveNote() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
         content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
