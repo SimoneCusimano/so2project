@@ -1,10 +1,13 @@
 package com.unica.so2.enotesrecorder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -25,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class NewNoteActivity extends Activity {
+public class NewNoteActivity extends AppCompatActivity {
     ImageButton _cancel, _stop, _record;
     private EditText _titleEditText, _descriptionEditText;
     private RatingBar _ratingBar;
@@ -39,23 +42,23 @@ public class NewNoteActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_new);
-
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         LinearLayout buttonsAreaLinearLayout = (LinearLayout)findViewById(R.id.buttonsAreaLinearLayout);
-        buttonsAreaLinearLayout.addView(findViewById(R.id.newButtonsLinearLayout));
+
+        LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.content_note_new_buttons, null);
+        buttonsAreaLinearLayout.addView(ll);
 
         _cancel = (ImageButton) findViewById(R.id.cancelImageButton);
         _stop = (ImageButton) findViewById(R.id.stopImageButton);
         _record = (ImageButton) findViewById(R.id.recImageButton);
         _save = (FloatingActionButton) findViewById(R.id.saveFloatingActionButton);
-        _titleEditText = (EditText) findViewById(R.id.title);
+        _titleEditText = (EditText) findViewById(R.id.titleEditText);
         _descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         _ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
         _stop.setEnabled(false);
         _cancel.setEnabled(false);
         _currentRecordingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/Temp.3gp";
-
 
         _record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,14 +167,18 @@ public class NewNoteActivity extends Activity {
                 note.setContent(content);
 
                 DbHandler dbHandler = new DbHandler(v.getContext());
+                dbHandler.open();
                 long result = dbHandler.addNote(note);
+                dbHandler.close();
                 if(result != -1) {
                     Toast.makeText(getApplicationContext(), "Note Created", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "Unable to Create the Note", Toast.LENGTH_SHORT).show();
                 }
-                dbHandler.close();
+
+                Intent i = new Intent(v.getContext(), NoteListActivity.class);
+                startActivity(i);
             }
         });
     }

@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v7.widget.Toolbar;
 
+import com.unica.so2.enotesrecorder.Adapter.NoteAdapter;
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
 import com.unica.so2.enotesrecorder.Model.Note;
 
@@ -96,11 +97,17 @@ public class NoteListActivity extends AppCompatActivity {
         // Get all of the notes from the database and create the item list
         DbHandler dbHandler = new DbHandler(this);
         dbHandler.open();
-        ArrayList<Note> notes = dbHandler.getAllNotesDescendingDate();
+        ArrayList<Note> notesArrayList = dbHandler.getAllNotesAscendingDate();
         dbHandler.close();
 
-        String[] notesArrayList = notes.toArray(new String[notes.size()]);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
+        // Create the adapter to convert the array to views
+        NoteAdapter adapter = new NoteAdapter(this, notesArrayList);
+        // Attach the adapter to a ListView
         _notesList.setAdapter(adapter);
+
+
+
+        //String[]  = notes.toArray(new String[notes.size()]);
+        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, notesArrayList);
     }
 }
