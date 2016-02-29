@@ -69,8 +69,8 @@
                 android:id="@+id/descriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="18sp"
-                android:layout_weight="3"
+                android:textSize="16sp"
+                android:layout_weight="2"
                 android:layout_gravity="center_vertical"
                 android:text="@string/descriptionTextView_contentNewNote" />
 
@@ -82,7 +82,7 @@
                 android:numStars="5"
                 android:stepSize="0.5"
                 android:rating="0"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:layout_toRightOf="@+id/descriptionTextView"/>
 
         </LinearLayout>
@@ -95,8 +95,7 @@
             android:gravity="top|left"
             android:maxLines="5"
             android:scrollbars="vertical"
-            android:hint="Insert your description here..."
-            android:layout_weight="2.21" />
+            android:hint="@string/descriptionEditText_NewEdit" />
 
     </LinearLayout>
 

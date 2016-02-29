@@ -45,9 +45,10 @@ public class EditNoteActivity extends AppCompatActivity {
     private MediaPlayer _mediaPlayer;
     private double _startTime = 0;
     private double _finalTime = 0;
-    private int forwardTime = 5000;
-    private int backwardTime = 5000;
+    private int _forwardTime = 5000;
+    private int _backwardTime = 5000;
     private Handler _handler = new Handler();
+    private int _currentPositionOnPause = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,12 +107,20 @@ public class EditNoteActivity extends AppCompatActivity {
                     if(_mediaPlayer.isPlaying()){
                         _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                         _mediaPlayer.pause();
-
-                        _handler.postDelayed(UpdateSongTime, 100);
+                        _currentPositionOnPause = _mediaPlayer.getCurrentPosition();
                     }
                     else {
                         _play.setImageResource(R.drawable.ic_pause_black_48dp);
-                        _mediaPlayer.prepare();
+
+                        if (_mediaPlayer.getCurrentPosition() > 0) {
+                            _mediaPlayer.seekTo(_currentPositionOnPause);
+                            _mediaPlayer.start();
+                        }
+                        else {
+                            _mediaPlayer.prepare();
+                            _handler.postDelayed(UpdateAudioRecordTime, 100);
+                        }
+
                     }
                 }
                 catch (Exception e) {
@@ -124,22 +133,10 @@ public class EditNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                _mediaPlayer.stop();
                 _stop.setEnabled(false);
                 _fastForward.setEnabled(false);
                 _fastBackward.setEnabled(false);
-                _mediaPlayer.stop();
-            }
-        });
-        _fastBackward.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int temp = (int) _startTime;
-
-                if((temp+forwardTime)<= _finalTime){
-                    _startTime = _startTime + forwardTime;
-                    _mediaPlayer.seekTo((int) _startTime);
-                    //Toast.makeText(getApplicationContext(),"You have Jumped forward 5 seconds",Toast.LENGTH_SHORT).show();
-                }
             }
         });
         _fastForward.setOnClickListener(new View.OnClickListener() {
@@ -147,10 +144,20 @@ public class EditNoteActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int temp = (int) _startTime;
 
-                if((temp-backwardTime)>0){
-                    _startTime = _startTime - backwardTime;
+                if((temp+ _forwardTime)<= _finalTime){
+                    _startTime = _startTime + _forwardTime;
                     _mediaPlayer.seekTo((int) _startTime);
-                    //Toast.makeText(getApplicationContext(),"You have Jumped backward 5 seconds",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        _fastBackward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int temp = (int) _startTime;
+
+                if((temp- _backwardTime)>0){
+                    _startTime = _startTime - _backwardTime;
+                    _mediaPlayer.seekTo((int) _startTime);
                 }
             }
         });
@@ -163,12 +170,11 @@ public class EditNoteActivity extends AppCompatActivity {
             }
         });
         _mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp) {
+            public void onCompletion(MediaPlayer mediaPlayer) {
                 try {
-                    Log.i("Completion Listener", "Song Complete");
-                    mp.stop();
-                    mp.reset();
-                    mp.setDataSource(_currentFilePath);
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(_currentFilePath);
                     _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     _stop.setEnabled(false);
                     _fastForward.setEnabled(false);
@@ -292,6 +298,7 @@ public class EditNoteActivity extends AppCompatActivity {
         content.setAudio(FileHelper.encodeFileInString(new File(_currentFilePath)));
 
         Note note = new Note();
+        note.setId(_noteId);
         note.setTitle(_titleEditText.getText().toString());
         note.setRating(_ratingBar.getRating());
         note.setContent(content);
@@ -309,7 +316,7 @@ public class EditNoteActivity extends AppCompatActivity {
 
     }
 
-    private Runnable UpdateSongTime = new Runnable() {
+    private Runnable UpdateAudioRecordTime = new Runnable() {
         public void run() {
             _startTime = _mediaPlayer.getCurrentPosition();
             _counterAudio.setText(

@@ -8,4 +8,5 @@
     <string name="ratingTextView_itemNote">Rating</string>
     <string name="titleTextView_newNote">Title:</string>
     <string name="descriptionTextView_contentNewNote">Description:</string>
+    <string name="descriptionEditText_NewEdit">Insert your description here...</string>
 </resources>
