@@ -87,7 +87,7 @@ public class JsonHelper {
     
             try {
                 JSONObject json = new JSONObject(jsonString);
-                note.setId(json.getString("id"));
+                note.setId(Integer.parseInt(json.getString("id")));
                 note.setTitle(json.getString("title"));
                 note.setContent(deserializeContent(json.getString("content")));
                 note.setLastEdit(GenericHelper.stringToDate(json.getString("lastEdit")));
