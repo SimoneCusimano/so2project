@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 
 public class FileHelper {
+    private static final String TAG = "FileHelper";
 
     public static String encodeFileInString(File file) {
         String encodedString = "";
@@ -24,7 +25,7 @@ public class FileHelper {
             encodedString = Base64.encodeToString(bytes, 0);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return encodedString;
@@ -36,8 +37,8 @@ public class FileHelper {
             byte[] decoded = Base64.decode(encodedString, 0);
             FileUtils.writeByteArrayToFile(new File(pathFile), decoded);
         }
-        catch(Exception e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
@@ -52,8 +53,8 @@ public class FileHelper {
             }
             bufferedOutputStream.close();
         }
-        catch (Exception e){
-            e.printStackTrace();
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return bufferedOutputStream;
@@ -65,8 +66,8 @@ public class FileHelper {
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 }

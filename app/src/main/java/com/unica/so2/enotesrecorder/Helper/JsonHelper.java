@@ -1,12 +1,15 @@
 package com.unica.so2.enotesrecorder.Helper;
 
 
+import android.util.Log;
+
 import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
 import org.json.JSONObject;
 
 public class JsonHelper {
+    private static final String TAG = "JsonHelper";
 
        /** This method implements the serialization from the Content, passed as parameter,
         *  to a Json String
@@ -24,7 +27,7 @@ public class JsonHelper {
                 jsonString = jsonObject.toString();
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
 
             return jsonString;
@@ -44,7 +47,7 @@ public class JsonHelper {
                 content.setAudio(json.getString("audio"));
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
 
             return content;
@@ -70,7 +73,7 @@ public class JsonHelper {
                 jsonString = jsonObject.toString();
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
     
             return jsonString;
@@ -87,14 +90,14 @@ public class JsonHelper {
     
             try {
                 JSONObject json = new JSONObject(jsonString);
-                note.setId(json.getString("id"));
+                note.setId(Integer.parseInt(json.getString("id")));
                 note.setTitle(json.getString("title"));
                 note.setContent(deserializeContent(json.getString("content")));
                 note.setLastEdit(GenericHelper.stringToDate(json.getString("lastEdit")));
                 note.setRating((float)json.getDouble("rating"));
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
     
             return note;

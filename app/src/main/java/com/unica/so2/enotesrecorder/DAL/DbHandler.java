@@ -319,8 +319,8 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             cursor.close();
 
         }
-        catch (Exception e){
-            Log.e("error", e + "");
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
         return count;
     }

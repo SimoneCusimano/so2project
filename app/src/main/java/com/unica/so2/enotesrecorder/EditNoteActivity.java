@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class EditNoteActivity extends AppCompatActivity {
+    private static final String TAG = "EditNoteActivity";
+
     private EditText _titleEditText, _descriptionEditText;
     private RatingBar _ratingBar;
     private ImageButton _play, _stop, _fastForward, _fastBackward;
@@ -215,8 +218,8 @@ public class EditNoteActivity extends AppCompatActivity {
                             TimeUnit.MILLISECONDS.toMinutes((long) _finalTime),
                             TimeUnit.MILLISECONDS.toSeconds((long) _finalTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) _finalTime))));
         }
-        catch(Exception e){
-            e.printStackTrace();
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
@@ -245,8 +248,8 @@ public class EditNoteActivity extends AppCompatActivity {
             startActivity(Intent.createChooser(sendEmailIntent, "Send mail..."));
             finish();
         }
-        catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(EditNoteActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        catch (android.content.ActivityNotFoundException e) {
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
