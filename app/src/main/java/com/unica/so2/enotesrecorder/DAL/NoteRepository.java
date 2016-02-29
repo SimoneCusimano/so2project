@@ -25,7 +25,7 @@ public interface NoteRepository {
 
     boolean deleteNote(long id);
 
-    Note getNote(long id) throws SQLException;
+    Note getNote(long id);
 
-
+    ArrayList<Note> getNoteListFromQuery(String query);
 }

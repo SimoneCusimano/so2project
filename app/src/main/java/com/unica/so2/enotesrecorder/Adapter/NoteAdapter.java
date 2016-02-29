@@ -46,7 +46,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
     @Override
     public long getItemId(int position) {
-        //return ID based on the position
         return _notesArrayList.get(position).getId();
     }
 }

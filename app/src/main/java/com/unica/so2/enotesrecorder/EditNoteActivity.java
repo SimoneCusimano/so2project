@@ -264,14 +264,16 @@ public class EditNoteActivity extends AppCompatActivity {
         note.setContent(content);
 
         DbHandler dbHandler = new DbHandler(this);
+        dbHandler.open();
         boolean result = dbHandler.updateNote(note);
+        dbHandler.close();
         if (result) {
             Toast.makeText(getApplicationContext(), "Note Updated", Toast.LENGTH_SHORT).show();
         }
         else {
             Toast.makeText(getApplicationContext(), "Unable to Update the Note", Toast.LENGTH_SHORT).show();
         }
-        dbHandler.close();
+
     }
 
     private Runnable UpdateSongTime = new Runnable() {

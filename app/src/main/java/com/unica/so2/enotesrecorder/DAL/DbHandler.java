@@ -6,18 +6,14 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.unica.so2.enotesrecorder.Helper.GenericHelper;
 import com.unica.so2.enotesrecorder.Helper.JsonHelper;
-import com.unica.so2.enotesrecorder.Model.Content;
 import com.unica.so2.enotesrecorder.Model.Note;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
@@ -191,9 +187,10 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      *
      * @return ArrayList<Note> of all the notes
      */
+    @Override
     public ArrayList<Note> getAllNotesDescendingDate() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + " DESC," + KEY_TITLE + " ASC";
-        return GetNoteListFromQuery(query);
+        return getNoteListFromQuery(query);
     }
 
     /**
@@ -202,9 +199,10 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      *
      * @return ArrayList<Note> of all the notes
      */
+    @Override
     public ArrayList<Note> getAllNotesAscendingDate() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + "," + KEY_TITLE + " ASC";
-        return GetNoteListFromQuery(query);
+        return getNoteListFromQuery(query);
     }
 
     /**
@@ -213,9 +211,10 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      *
      * @return ArrayList<Note> of all the notes
      */
+    @Override
     public ArrayList<Note> getAllNotesDescendingRating() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " DESC";
-        return GetNoteListFromQuery(query);
+        return getNoteListFromQuery(query);
     }
 
     /**
@@ -223,9 +222,10 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      *
      * @return ArrayList<Note> of all the notes
      */
+    @Override
     public ArrayList<Note> getAllNotesAscendingRating() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " ASC";
-        return GetNoteListFromQuery(query);
+        return getNoteListFromQuery(query);
     }
 
     /**
@@ -233,13 +233,15 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      *
      * @return ArrayList<Note> of all the notes
      */
+    @Override
     public ArrayList<Note> getAllNotesByRate(float rating) {
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_RATING + " = " + rating;
-        return GetNoteListFromQuery(query);
+        return getNoteListFromQuery(query);
     }
 
-    private ArrayList<Note> GetNoteListFromQuery(String query) {
-        ArrayList<Note> list= new ArrayList<>();
+    @Override
+    public ArrayList<Note> getNoteListFromQuery(String query) {
+        ArrayList<Note> list = new ArrayList<>();
 
         try {
             Cursor cursor = _db.rawQuery(query,null);
