@@ -116,7 +116,15 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public boolean deleteNote(long id) {
-        return _db.delete(TABLE_NAME, KEY_ID + "=" + id, null) > 0;
+        boolean isNoteDeleted = false;
+        try {
+            isNoteDeleted = _db.delete(TABLE_NAME, KEY_ID + "=" + id, null) > 0;
+        }
+        catch(Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+
+        return isNoteDeleted;
     }
 
     /**
@@ -155,17 +163,23 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public Note getNote(long id) {
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE _id=" + id;
-        Cursor cursor = _db.rawQuery(query, null);
         Note note = new Note();
-        if(cursor.moveToFirst()) {
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
 
+        try {
+            String query = "SELECT * FROM " + TABLE_NAME + " WHERE _id=" + id;
+            Cursor cursor = _db.rawQuery(query, null);
+
+            if(cursor.moveToFirst()) {
+                note.setId(Integer.parseInt(cursor.getString(0)));
+                note.setTitle(cursor.getString(1));
+                note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+                note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+                note.setRating(cursor.getFloat(4));
+            }
             cursor.close();
+        }
+        catch(Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return note;
@@ -179,23 +193,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     public ArrayList<Note> getAllNotesDescendingDate() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + " DESC," + KEY_TITLE + " ASC";
-
-        Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list = new ArrayList<>();
-
-        while(cursor.moveToNext()) {
-            Note note = new Note();
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
-
-            list.add(note);
-        }
-
-        cursor.close();
-        return list;
+        return GetNoteListFromQuery(query);
     }
 
     /**
@@ -206,23 +204,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     public ArrayList<Note> getAllNotesAscendingDate() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_LAST_EDIT + "," + KEY_TITLE + " ASC";
-
-        Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list= new ArrayList<>();
-
-        while(cursor.moveToNext()){
-            Note note = new Note();
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
-
-            list.add(note);
-        }
-
-        cursor.close();
-        return list;
+        return GetNoteListFromQuery(query);
     }
 
     /**
@@ -233,23 +215,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     public ArrayList<Note> getAllNotesDescendingRating() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " DESC";
-
-        Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list= new ArrayList<>();
-
-        while(cursor.moveToNext()){
-            Note note=new Note();
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
-
-            list.add(note);
-        }
-
-        cursor.close();
-        return list;
+        return GetNoteListFromQuery(query);
     }
 
     /**
@@ -259,23 +225,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     public ArrayList<Note> getAllNotesAscendingRating() {
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " ASC";
-
-        Cursor cursor = _db.rawQuery(query,null);
-        ArrayList<Note> list= new ArrayList<>();
-
-        while(cursor.moveToNext()){
-            Note note=new Note();
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
-
-            list.add(note);
-        }
-
-        cursor.close();
-        return list;
+        return GetNoteListFromQuery(query);
     }
 
     /**
@@ -285,22 +235,31 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     public ArrayList<Note> getAllNotesByRate(float rating) {
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_RATING + " = " + rating;
+        return GetNoteListFromQuery(query);
+    }
 
-        Cursor cursor = _db.rawQuery(query,null);
+    private ArrayList<Note> GetNoteListFromQuery(String query) {
         ArrayList<Note> list= new ArrayList<>();
 
-        while(cursor.moveToNext()){
-            Note note=new Note();
-            note.setId(Integer.parseInt(cursor.getString(0)));
-            note.setTitle(cursor.getString(1));
-            note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
-            note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
-            note.setRating(cursor.getFloat(4));
+        try {
+            Cursor cursor = _db.rawQuery(query,null);
 
-            list.add(note);
+            while (cursor.moveToNext()) {
+                Note note = new Note();
+                note.setId(Integer.parseInt(cursor.getString(0)));
+                note.setTitle(cursor.getString(1));
+                note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
+                note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
+                note.setRating(cursor.getFloat(4));
+                list.add(note);
+            }
+
+            cursor.close();
+        }
+        catch(Exception e) {
+            Log.e(TAG, e.getMessage(), e);
         }
 
-        cursor.close();
         return list;
     }
 
@@ -313,16 +272,16 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     public int getNoteCount() {
         int count = 0;
 
-        try{
+        try {
             String QUERY = "SELECT * FROM " + TABLE_NAME;
             Cursor cursor = _db.rawQuery(QUERY, null);
             count = cursor.getCount();
             cursor.close();
-
         }
         catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
+
         return count;
     }
 
