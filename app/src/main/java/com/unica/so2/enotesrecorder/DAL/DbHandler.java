@@ -185,7 +185,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * Return the list of all notes in the database, order by date in descending order
      * and then by title in ascending order
      *
-     * @return ArrayList<Note> of all the notes
+     * @return ArrayList<Note> of all the notes ordered
      */
     @Override
     public ArrayList<Note> getAllNotesDescendingDate() {
@@ -197,7 +197,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * Return the list of all notes in the database, order by date in descending order
      * and then by title in ascending order
      *
-     * @return ArrayList<Note> of all the notes
+     * @return ArrayList<Note> of all the notes ordered
      */
     @Override
     public ArrayList<Note> getAllNotesAscendingDate() {
@@ -209,7 +209,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * Return the list of all notes in the database, order by date in descending order
      * and then by title in ascending order
      *
-     * @return ArrayList<Note> of all the notes
+     * @return ArrayList<Note> of all the notes ordered
      */
     @Override
     public ArrayList<Note> getAllNotesDescendingRating() {
@@ -220,7 +220,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     /**
      * Return the list of all notes in the database, order by rating in descending order
      *
-     * @return ArrayList<Note> of all the notes
+     * @return ArrayList<Note> of all the notes ordered
      */
     @Override
     public ArrayList<Note> getAllNotesAscendingRating() {
@@ -229,9 +229,9 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     }
 
     /**
-     * Return the list of all notes in the database, order by rating in descending order
+     * Return the list of all notes in the databasewith the given rating value
      *
-     * @return ArrayList<Note> of all the notes
+     * @return ArrayList<Note> of all the proper notes
      */
     @Override
     public ArrayList<Note> getAllNotesByRate(float rating) {
@@ -239,6 +239,13 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         return getNoteListFromQuery(query);
     }
 
+    /**
+     * Return the list of all notes in the database selected with the options specified in the query
+     * passed as parameter
+     *
+     * @query the 'SELECT' query
+     * @return ArrayList<Note> of all the notes ordered
+     */
     @Override
     public ArrayList<Note> getNoteListFromQuery(String query) {
         ArrayList<Note> list = new ArrayList<>();
@@ -286,6 +293,5 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         return count;
     }
-
 
 }

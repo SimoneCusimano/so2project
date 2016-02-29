@@ -4,4 +4,8 @@
     <string name="action_new">New</string>
     <string name="title_activity_new_note">NewNoteActivity</string>
     <string name="title_activity_edit_note">Edit Note</string>
+    <string name="titleTextView_itemNote">Title</string>
+    <string name="ratingTextView_itemNote">Rating</string>
+    <string name="titleTextView_newNote">Title:</string>
+    <string name="descriptionTextView_contentNewNote">Description:</string>
 </resources>

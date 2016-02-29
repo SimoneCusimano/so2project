@@ -16,11 +16,13 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
     private ArrayList<Note> _notesArrayList;
 
+    /* Constructor */
     public NoteAdapter(Context context, ArrayList<Note> notes) {
         super(context, 0, notes);
         _notesArrayList = notes;
     }
 
+    /*This method populates and returns the view to render on screen*/
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
@@ -44,6 +46,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         return convertView;
     }
 
+    /*This method return the id of the note at the specified position, passed as parameter*/
     @Override
     public long getItemId(int position) {
         return _notesArrayList.get(position).getId();

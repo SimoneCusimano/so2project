@@ -11,8 +11,7 @@ import org.json.JSONObject;
 public class JsonHelper {
     private static final String TAG = "JsonHelper";
 
-       /** This method implements the serialization from the Content, passed as parameter,
-        *  to a Json String
+       /** TImplements the serialization from the Content, passed as parameter, to a Json String
         *
         * @return String, throws an exception otherwise
         * */
@@ -33,8 +32,7 @@ public class JsonHelper {
             return jsonString;
         }
 
-    /** This method implements the deserialization from a String, passed as parameter,
-     *  to a Content
+    /** Implements the deserialization from a String, passed as parameter, to a Content
      *
      * @return Content, throws an exception otherwise
      * */
@@ -54,8 +52,7 @@ public class JsonHelper {
         }
 
 
-    /** This method implements the serialization from the Note, passed as parameter,
-     *  to a Json String
+    /** Implements the serialization from the Note, passed as parameter, to a Json String
      *
      * @return String of the jsonObject created, throws an exception otherwise
      * */

@@ -17,6 +17,7 @@ import java.util.List;
 public class FileHelper {
     private static final String TAG = "FileHelper";
 
+    /*Takes a file as parameters and codifies it in a base64 string*/
     public static String encodeFileInString(File file) {
         String encodedString = "";
 
@@ -31,6 +32,8 @@ public class FileHelper {
         return encodedString;
     }
 
+    /* Takes a base64 string as parameters and decodes it in a file
+     * with the path specified by the parameter */
     public static void decodeStringInFile(String encodedString, String pathFile)
     {
         try {
@@ -42,6 +45,7 @@ public class FileHelper {
         }
     }
 
+    /*Implements the merging of a list of files */
     public static BufferedOutputStream mergeAudio(List<File> filesToMerge)
     {
         BufferedOutputStream bufferedOutputStream = null;
@@ -60,6 +64,7 @@ public class FileHelper {
         return bufferedOutputStream;
     }
 
+    /*Write a json string into a file, passed as parameters*/
     public static void writeJsonToFile(String filePath, String data, Context context) {
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(filePath, Context.MODE_PRIVATE));
