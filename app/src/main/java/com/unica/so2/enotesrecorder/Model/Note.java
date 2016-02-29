@@ -4,7 +4,7 @@ import java.util.Date;
 
 
 public class Note {
-    private String _id;
+    private long _id;
     private String _title;
     private Content _content;
     private Date _lastEdit;
@@ -12,7 +12,7 @@ public class Note {
 
     public Note(){}
 
-    public Note(String id, String title, Content content, Date lastEdit, float rating) {
+    public Note(long id, String title, Content content, Date lastEdit, float rating) {
         this._id = id;
         this._title = title;
         this._content = content;
@@ -20,11 +20,11 @@ public class Note {
         this._rating = rating;
     }
 
-    public String getId() {
+    public long getId() {
         return _id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this._id = id;
     }
 

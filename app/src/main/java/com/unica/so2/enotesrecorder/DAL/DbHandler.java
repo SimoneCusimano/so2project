@@ -20,6 +20,7 @@ import java.util.Locale;
 
 public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
+    private static final String TAG = "DbHandler";
     private SQLiteDatabase _db;
 
     private static final String DB_NAME = "eNotesRecorder";
@@ -102,8 +103,9 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
             initialValues.put(KEY_LAST_EDIT, lastEditString);
             initialValues.put(KEY_RATING, note.getRating());
             result = _db.insert(TABLE_NAME, null, initialValues);
-        }catch (Exception e){
-            Log.e("problem",e+"");
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
             result = -1;
         }
         return result;
@@ -156,7 +158,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
         Cursor cursor = _db.rawQuery(query, null);
         Note note = new Note();
         if(cursor.moveToFirst()) {
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
@@ -182,7 +184,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         while(cursor.moveToNext()) {
             Note note = new Note();
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
@@ -209,7 +211,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         while(cursor.moveToNext()){
             Note note = new Note();
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
@@ -229,7 +231,6 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * @return ArrayList<Note> of all the notes
      */
     public ArrayList<Note> getAllNotesDescendingRating() {
-        ArrayList<Note> noteList;
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " DESC";
 
         Cursor cursor = _db.rawQuery(query,null);
@@ -237,7 +238,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         while(cursor.moveToNext()){
             Note note=new Note();
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
@@ -256,7 +257,6 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * @return ArrayList<Note> of all the notes
      */
     public ArrayList<Note> getAllNotesAscendingRating() {
-        ArrayList<Note> noteList;
         String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + KEY_RATING + " ASC";
 
         Cursor cursor = _db.rawQuery(query,null);
@@ -264,7 +264,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         while(cursor.moveToNext()){
             Note note=new Note();
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));
@@ -283,7 +283,6 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      * @return ArrayList<Note> of all the notes
      */
     public ArrayList<Note> getAllNotesByRate(float rating) {
-        ArrayList<Note> noteList;
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_RATING + " = " + rating;
 
         Cursor cursor = _db.rawQuery(query,null);
@@ -291,7 +290,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
         while(cursor.moveToNext()){
             Note note=new Note();
-            note.setId(cursor.getString(0));
+            note.setId(Integer.parseInt(cursor.getString(0)));
             note.setTitle(cursor.getString(1));
             note.setContent(JsonHelper.deserializeContent(cursor.getString(2)));
             note.setLastEdit(GenericHelper.stringToDate(cursor.getString(3)));

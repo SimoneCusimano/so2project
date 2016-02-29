@@ -14,8 +14,11 @@ import java.util.ArrayList;
 
 public class NoteAdapter extends ArrayAdapter<Note> {
 
-    public NoteAdapter(Context context, ArrayList<Note> users) {
-        super(context, 0, users);
+    private ArrayList<Note> _notesArrayList;
+
+    public NoteAdapter(Context context, ArrayList<Note> notes) {
+        super(context, 0, notes);
+        _notesArrayList = notes;
     }
 
     @Override
@@ -39,5 +42,11 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        //return ID based on the position
+        return _notesArrayList.get(position).getId();
     }
 }

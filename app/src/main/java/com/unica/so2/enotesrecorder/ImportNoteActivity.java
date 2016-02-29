@@ -64,7 +64,6 @@ public class ImportNoteActivity extends Activity {
                     is.close();
 
                     Note note = JsonHelper.deserializeNote(buf.toString());
-                    note.setId(null);
                     DbHandler dbHandler = new DbHandler(this);
                     importedNoteId = dbHandler.addNote(note);
                     dbHandler.close();
