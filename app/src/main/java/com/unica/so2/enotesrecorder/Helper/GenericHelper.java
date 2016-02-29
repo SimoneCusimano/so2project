@@ -27,6 +27,11 @@ public class GenericHelper {
         return myDate;
     }
 
+    /**
+     * Convert the date, passed as parameter, into a string.
+     *
+     *  @return String the string converted, throws an exception otherwise
+     */
     public static String getStringFromDate(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_FORMAT, Locale.ITALY);
         return dateFormat.format(date);
