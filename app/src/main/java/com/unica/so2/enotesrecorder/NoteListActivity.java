@@ -77,15 +77,14 @@ public class NoteListActivity extends AppCompatActivity {
             case R.id.action_sortByLastEditDesc:
             case R.id.action_sortByRatingAsc:
             case R.id.action_sortByRatingDesc:
-                createListView(item.getItemId());
+                DEFAULT_SORTING = item.getItemId();
+                createListView(DEFAULT_SORTING);
                 return true;
-
 
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
@@ -103,9 +102,18 @@ public class NoteListActivity extends AppCompatActivity {
 
     private void createListView(int choose) {
         // Get all of the notes from the database and create the item list
+        ArrayList<Note> notesArrayList = getNoteListSortByParam(choose);
+        // Create the adapter to convert the array to views
+        NoteAdapter adapter = new NoteAdapter(this, notesArrayList);
+        // Attach the adapter to a ListView
+        _notesList.setAdapter(adapter);
+    }
+
+    private ArrayList<Note> getNoteListSortByParam(int choose) {
+        ArrayList<Note> notesArrayList;
         DbHandler dbHandler = new DbHandler(this);
         dbHandler.open();
-        ArrayList<Note> notesArrayList;
+
         switch(choose) {
             case R.id.action_sortByLastEditAsc:
                 notesArrayList = dbHandler.getAllNotesAscendingDate();
@@ -126,9 +134,6 @@ public class NoteListActivity extends AppCompatActivity {
 
         dbHandler.close();
 
-        // Create the adapter to convert the array to views
-        NoteAdapter adapter = new NoteAdapter(this, notesArrayList);
-        // Attach the adapter to a ListView
-        _notesList.setAdapter(adapter);
+        return notesArrayList;
     }
 }

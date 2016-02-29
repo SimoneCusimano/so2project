@@ -132,6 +132,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
     @Override
     public boolean updateNote(Note note) {
         boolean isNoteUpdated = false;
+
         try {
             ContentValues args = new ContentValues();
             long msTime = System.currentTimeMillis();

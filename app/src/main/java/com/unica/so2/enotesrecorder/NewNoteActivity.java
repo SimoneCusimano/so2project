@@ -66,41 +66,42 @@ public class NewNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    if (_isRecording) {
+                    /*if (_isRecording) {
                         // Pause stuff
                         _record.setImageResource(R.drawable.ic_mic_black_48dp);
 
                         _mediaRecorder.stop();
                         _filesToMerge.add(new File(_currentRecordingPath));
 
-                    } else {
-                        // Recording Mode
-                        _record.setImageResource(R.drawable.ic_pause_black_48dp);
+                    } else {*/
+                    // Recording Mode
+                    //_record.setImageResource(R.drawable.ic_pause_black_48dp);
 
-                        File directory = new File(_currentRecordingPath).getParentFile();
-                        if (!directory.exists()) {
-                            directory.mkdirs();
-                        }
-
-                        // Check if _mediaRecorder has been aborted (Cancel Event) and it needs to be reconfigured
-                        if (_mediaRecorder == null) {
-                            _mediaRecorder = new MediaRecorder();
-                            _mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                            _mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                            _mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                            _mediaRecorder.setOutputFile(_currentRecordingPath);
-                        }
-
-                        _mediaRecorder.prepare();
-                        _mediaRecorder.start();
-
-                        _stop.setEnabled(true);
-                        _cancel.setEnabled(true);
-
-                        Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT).show();
+                    File directory = new File(_currentRecordingPath).getParentFile();
+                    if (!directory.exists()) {
+                        directory.mkdirs();
                     }
 
-                    _isRecording = !_isRecording;
+                    // Check if _mediaRecorder has been aborted (Cancel Event) and it needs to be reconfigured
+                    if (_mediaRecorder == null) {
+                        _mediaRecorder = new MediaRecorder();
+                        _mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                        _mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                        _mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                        _mediaRecorder.setOutputFile(_currentRecordingPath);
+                    }
+
+                    _mediaRecorder.prepare();
+                    _mediaRecorder.start();
+
+                    _record.setEnabled(false);
+                    _stop.setEnabled(true);
+                    _cancel.setEnabled(true);
+
+                    Toast.makeText(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT).show();
+                    //}
+
+                    //_isRecording = !_isRecording;
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
                 }
@@ -122,8 +123,7 @@ public class NewNoteActivity extends AppCompatActivity {
                     _cancel.setEnabled(true);
 
                     Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_SHORT).show();
-                }
-                catch (IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     Log.e(TAG, e.getMessage(), e);
                 }
             }
@@ -162,7 +162,8 @@ public class NewNoteActivity extends AppCompatActivity {
                 Content content = new Content();
                 content.setDescription(_descriptionEditText.getText().toString());
                 //File file = FileHelper.mergeAudio(_filesToMerge);
-                //content.setAudio(FileHelper.encodeFileInString(new File));
+                File file = new File(_currentRecordingPath);
+                content.setAudio(FileHelper.encodeFileInString(file));
 
                 Note note = new Note();
                 note.setTitle(_titleEditText.getText().toString());

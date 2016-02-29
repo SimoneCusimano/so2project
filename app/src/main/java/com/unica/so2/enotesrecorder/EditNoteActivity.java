@@ -40,7 +40,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private TextView _counterAudio;
     private Long _noteId;
     private FloatingActionButton _update;
-    private String _outputFile;
+    private String _currentFilePath;
     private MediaPlayer _mediaPlayer;
     private double _startTime = 0;
     private double _finalTime = 0;
@@ -56,8 +56,8 @@ public class EditNoteActivity extends AppCompatActivity {
         LinearLayout ll = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.content_note_edit_buttons, null);
         buttonsAreaLinearLayout.addView(ll);
         setTitle(R.string.app_name);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         _mediaPlayer = new MediaPlayer();
         _titleEditText = (EditText) findViewById(R.id.titleEditText);
@@ -69,9 +69,7 @@ public class EditNoteActivity extends AppCompatActivity {
         _fastBackward = (ImageButton) findViewById(R.id.fastBackwardImageButton);
         _counterAudio = (TextView) findViewById(R.id.timerValueTextView);
         _update = (FloatingActionButton)findViewById(R.id.saveFloatingActionButton);
-        _outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
-        _finalTime = _mediaPlayer.getDuration();
-        _startTime = _mediaPlayer.getCurrentPosition();
+        _currentFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/com.unica.so2.enotesrecorder/PLACEHOLDER.3gp";
 
         _stop.setEnabled(false);
         _fastForward.setEnabled(false);
@@ -89,7 +87,6 @@ public class EditNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Updating...", Toast.LENGTH_SHORT).show();
-
                 saveNote();
             }
         });
@@ -97,26 +94,32 @@ public class EditNoteActivity extends AppCompatActivity {
         _play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                _fastBackward.setEnabled(true);
-                _fastForward.setEnabled(true);
-                _stop.setEnabled(false);
+                try{
+                    _fastBackward.setEnabled(true);
+                    _fastForward.setEnabled(true);
+                    _stop.setEnabled(true);
 
+                    if(_mediaPlayer.isPlaying()){
+                        _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                        _mediaPlayer.pause();
 
-                if(_mediaPlayer.isPlaying()){
-                    _play.setImageResource(R.drawable.ic_pause_black_48dp);
-                    _mediaPlayer.pause();
-
-                    _handler.postDelayed(UpdateSongTime, 100);
+                        _handler.postDelayed(UpdateSongTime, 100);
+                    }
+                    else {
+                        _play.setImageResource(R.drawable.ic_pause_black_48dp);
+                        _mediaPlayer.prepare();
+                    }
                 }
-                else {
-                    _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
-                    _mediaPlayer.start();
+                catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
                 }
+
             }
         });
         _stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                 _stop.setEnabled(false);
                 _fastForward.setEnabled(false);
                 _fastBackward.setEnabled(false);
@@ -144,6 +147,31 @@ public class EditNoteActivity extends AppCompatActivity {
                     _startTime = _startTime - backwardTime;
                     _mediaPlayer.seekTo((int) _startTime);
                     //Toast.makeText(getApplicationContext(),"You have Jumped backward 5 seconds",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        _mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer player) {
+                player.start();
+                _finalTime = _mediaPlayer.getDuration();
+                _startTime = _mediaPlayer.getCurrentPosition();
+            }
+        });
+        _mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                try {
+                    Log.i("Completion Listener", "Song Complete");
+                    mp.stop();
+                    mp.reset();
+                    mp.setDataSource(_currentFilePath);
+                    _play.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                    _stop.setEnabled(false);
+                    _fastForward.setEnabled(false);
+                    _fastBackward.setEnabled(false);
+                }
+                catch(Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
         });
@@ -211,7 +239,8 @@ public class EditNoteActivity extends AppCompatActivity {
             _titleEditText.setText(note.getTitle());
             _descriptionEditText.setText(note.getContent().getDescription());
             _ratingBar.setRating(note.getRating());
-            _mediaPlayer.setDataSource(_outputFile);
+            FileHelper.decodeStringInFile(note.getContent().getAudio(), _currentFilePath);
+            _mediaPlayer.setDataSource(_currentFilePath);
 
             _counterAudio.setText(
                     String.format("%d min, %d sec",
@@ -226,7 +255,7 @@ public class EditNoteActivity extends AppCompatActivity {
     protected void sendNoteByEmail() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
-        content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
+        content.setAudio(FileHelper.encodeFileInString(new File(_currentFilePath)));
 
         Note note = new Note();
         String noteTitle = _titleEditText.getText().toString();
@@ -256,7 +285,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private void saveNote() {
         Content content = new Content();
         content.setDescription(_descriptionEditText.getText().toString());
-        content.setAudio(FileHelper.encodeFileInString(new File(_outputFile)));
+        content.setAudio(FileHelper.encodeFileInString(new File(_currentFilePath)));
 
         Note note = new Note();
         note.setTitle(_titleEditText.getText().toString());
