@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.unica.so2.enotesrecorder.Helper.GenericHelper;
@@ -96,11 +97,7 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
 
             initialValues.put(KEY_TITLE, note.getTitle());
             initialValues.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
-
-            SimpleDateFormat dateFormat =  new SimpleDateFormat("dd MM dd yyyy - HH:mm:ss", Locale.ITALY);
-            String lastEditString = dateFormat.format(currentDateTime);
-
-            initialValues.put(KEY_LAST_EDIT, lastEditString);
+            initialValues.put(KEY_LAST_EDIT, GenericHelper.getStringFromDate(currentDateTime));
             initialValues.put(KEY_RATING, note.getRating());
             result = _db.insert(TABLE_NAME, null, initialValues);
         }
@@ -130,20 +127,24 @@ public class DbHandler extends SQLiteOpenHelper implements NoteRepository {
      */
     @Override
     public boolean updateNote(Note note) {
-        ContentValues args = new ContentValues();
-        long msTime = System.currentTimeMillis();
-        Date currentDateTime = new Date(msTime);
+        boolean isNoteUpdated = false;
+        try {
+            ContentValues args = new ContentValues();
+            long msTime = System.currentTimeMillis();
+            Date currentDateTime = new Date(msTime);
 
-        args.put(KEY_TITLE, note.getTitle());
-        args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
+            args.put(KEY_TITLE, note.getTitle());
+            args.put(KEY_CONTENT, JsonHelper.serializeContent(note.getContent()));
+            args.put(KEY_LAST_EDIT, GenericHelper.getStringFromDate(currentDateTime));
+            args.put(KEY_RATING, note.getRating());
 
-        SimpleDateFormat dateFormat =  new SimpleDateFormat("dd MM dd yyyy - HH:mm:ss", Locale.ITALY);
-        String lastEditString = dateFormat.format(currentDateTime);
+            isNoteUpdated = _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
+        }
+        catch(Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
 
-        args.put(KEY_LAST_EDIT, lastEditString);
-        args.put(KEY_RATING, note.getRating());
-
-        return _db.update(TABLE_NAME, args, KEY_ID + "=" + note.getId(), null) > 0;
+        return isNoteUpdated;
     }
 
     /**
