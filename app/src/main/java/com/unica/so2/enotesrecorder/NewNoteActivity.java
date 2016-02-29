@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,6 +30,8 @@ import java.util.List;
 
 
 public class NewNoteActivity extends AppCompatActivity {
+    private static final String TAG = "NewNoteActivity";
+
     ImageButton _cancel, _stop, _record;
     private EditText _titleEditText, _descriptionEditText;
     private RatingBar _ratingBar;
@@ -99,9 +102,10 @@ public class NewNoteActivity extends AppCompatActivity {
 
                     _isRecording = !_isRecording;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
+
         });
 
         _stop.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +124,7 @@ public class NewNoteActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_SHORT).show();
                 }
                 catch (IllegalStateException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
         });
@@ -145,7 +149,7 @@ public class NewNoteActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Recording aborted", Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
         });

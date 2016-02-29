@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.unica.so2.enotesrecorder.DAL.DbHandler;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class ImportNoteActivity extends Activity {
+    private static final String TAG = "ImportNoteActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +32,9 @@ public class ImportNoteActivity extends Activity {
             getIntent().setData(null);
             try {
                 noteId = importData(data);
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Import aborted", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
                 finish();
                 return;
             }
@@ -70,7 +73,7 @@ public class ImportNoteActivity extends Activity {
                 }
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
         }
 

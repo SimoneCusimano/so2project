@@ -1,11 +1,14 @@
 package com.unica.so2.enotesrecorder.Helper;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class GenericHelper {
-    public static String DATE_TIME_FORMAT = "dd MM dd yyyy - HH:mm:ss";
+    public static final String DATE_TIME_FORMAT = "dd MM dd yyyy - HH:mm:ss";
+    private static final String TAG = "GenericHelper";
 
     /**
      * Convert the string, passed as parameter, into a Date.
@@ -19,7 +22,7 @@ public class GenericHelper {
             myDate = dateFormat.parse(date);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
         return myDate;
     }
